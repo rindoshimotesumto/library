@@ -1,7 +1,7 @@
 from aiogram import F, Router
 from aiogram.types import CallbackQuery, Message
 
-from bot.ui.inline_kb import back_to_menu
+from bot.ui.inline_kb import back_to_menu, show_book_list
 from db.database import DataBase
 from db.repo.books import BooksService
 from db.repo.categories import CategoriesService
@@ -16,9 +16,9 @@ categories_service = CategoriesService(db)
 @router.callback_query(F.data.startswith("menu:"))
 async def callback_h(callback: CallbackQuery):
     await callback.answer()
-    
-    books = False
-    categories = False
+
+    categories = 0
+    books = 0
 
     if not callback.data:
         return
@@ -29,15 +29,13 @@ async def callback_h(callback: CallbackQuery):
     keyboard = await back_to_menu()
     call_data = callback.data.removeprefix("menu:")
 
-    if await books_service.has_books():
-        books = True
-        
-    if await categories_service.has_categories():
-        categories = True
-
     if call_data == "books":
-        if books:
-            await callback.message.edit_text(UZ_TEXTS["books:list"], reply_markup=keyboard)
+        book_list = await books_service.get_books()
+
+        if book_list:
+            books_kb = await show_book_list(book_list)
+            await callback.message.answer(UZ_TEXTS["books:list"], reply_markup=books_kb)
+            await callback.message.delete()
             return
 
         await callback.message.edit_text(UZ_TEXTS["no:books"], reply_markup=keyboard)

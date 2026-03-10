@@ -33,13 +33,35 @@ async def back_to_menu() -> InlineKeyboardMarkup:
     
     builder.adjust(1)
     return builder.as_markup()
+
+
+async def back_to_book_list(book_file_id: str) -> InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+
+    builder.row(
+        InlineKeyboardButton(text=UZ_BTNS["navigation_menu"]["back"], callback_data="menu:books")
+    )
+
+    builder.row(
+        InlineKeyboardButton(text=UZ_BTNS["get_book"]["book:download"], callback_data=f"book:download:{book_file_id}")
+    )
+
+    builder.adjust(2)
+    return builder.as_markup()
     
 
-async def show_info_list(info_list: dict) -> InlineKeyboardMarkup:
+async def show_book_list(book_list: list[dict]) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
-    info_count = 0
-    
-    # кб для показа информации ввиде кнопок
-    
-    builder.adjust(*([1]*info_count), 2)
+
+    for book in book_list:
+
+        builder.row(
+            InlineKeyboardButton(text=f"📖 {book['book_name']}", callback_data=f"book:id:{book['book_id']}")
+        )
+
+    builder.row(
+        InlineKeyboardButton(text=UZ_BTNS["navigation_menu"]["back"], callback_data="back:menu")
+    )
+
+    builder.adjust(*([1]*len(book_list)), 2)
     return builder.as_markup()

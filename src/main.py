@@ -4,7 +4,7 @@ from os import getenv
 from aiogram import Bot, Dispatcher
 from dotenv import load_dotenv
 
-from bot.handlers import welcome, back, menu
+from bot.handlers import welcome, navigation, menu, book, admin
 from config.logging import logger
 
 from db.database import DataBase
@@ -25,8 +25,10 @@ async def main() -> None:
 
     dp.include_routers(
         welcome.router,
-        back.router,
+        navigation.router,
         menu.router,
+        book.router,
+        admin.router,
     )
 
     bot = Bot(token=TOKEN)

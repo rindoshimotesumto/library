@@ -98,10 +98,14 @@ UZ_BTNS: dict[str, dict[str, str]] = {
     "admin_panel": {
         # ===== Admin Panel =====
         "admin:add:book": "➕ Kitob qo‘shish",
-        "admin:delete:book": "🗑 Kitob o‘chirish",
-        "admin:edit:book": "✏️ Kitobni tahrirlash",
         "admin:add:category": "➕ Kategoriya qo‘shish",
+        "admin:delete:book": "🗑 Kitob o‘chirish",
         "admin:delete:category": "🗑 Kategoriya o‘chirish",
-        "admin:edit:category": "✏️ Kategoriya tahrirlash",
+        "admin:edit:book": "✏️ Kitobni tahrirlash",
+        "admin:edit:category": "✏️ Kategoriya tahrirlash"
     },
+
+    "get_book": {
+        "book:download": "⬇️ Yuklab olish"
+    }
 }

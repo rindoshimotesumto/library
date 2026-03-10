@@ -1,4 +1,4 @@
-from aiogram import Router
+from aiogram import Router, F
 from aiogram.filters import Command
 from aiogram.types import Message
 
@@ -14,7 +14,11 @@ async def cmd_start(message: Message):
     await message.answer(UZ_TEXTS["start"], reply_markup=keyboard)
 
 
-@router.message(Command("admin"))
-async def cmd_admin(message: Message):
-    keyboard = await main_menu("admin")
-    await message.answer(UZ_TEXTS["admin:panel"], reply_markup=keyboard)
+@router.message(F.photo)
+async def answer_photo_id(message: Message):
+    await message.answer(message.photo[-1].file_id)
+
+
+@router.message(F.document)
+async def answer_photo_id(message: Message):
+    await message.answer(message.document.file_id)

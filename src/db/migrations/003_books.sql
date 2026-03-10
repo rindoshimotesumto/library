@@ -4,12 +4,12 @@ CREATE TABLE IF NOT EXISTS books (
     book_name TEXT NOT NULL UNIQUE,
     author_id INTEGER NOT NULL,
     description TEXT NOT NULL,
-    file_id TEXT NOT NULL,
+    cover_file_id TEXT NOT NULL,
+    book_file_id TEXT NOT NULL,
     category_id INTEGER NOT NULL,
     pages INTEGER NOT NULL,
     language TEXT NOT NULL,
-    
-    
+
     FOREIGN KEY (author_id)
         REFERENCES authors(id)
         ON DELETE RESTRICT

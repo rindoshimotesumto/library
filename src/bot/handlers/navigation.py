@@ -1,10 +1,19 @@
 from aiogram import F, Router
 from aiogram.types import CallbackQuery, Message
 
-from bot.ui.inline_kb import main_menu
 from i18n.uz import UZ_TEXTS
 
+from bot.ui.inline_kb import main_menu
+from bot.ui.inline_kb import show_book_list
+
+from db.database import DataBase
+from db.repo.books import BooksService
+
+
+
 router = Router()
+db = DataBase()
+books_service = BooksService(db)
 
 
 @router.callback_query(F.data == "back:menu")
