@@ -46,13 +46,15 @@ class BooksService():
             book.id,
             book.book_name,
             book.description,
-            book.book_file_id,
+            book_file.file_id,
             book.cover_file_id
         FROM books book
         JOIN authors author
           ON author.id = book.author_id
         JOIN categories category
           ON category.id = book.category_id
+        JOIN book_files book_file
+          ON book_file.book_id = book.id
         WHERE book.id = ?
         """
 
@@ -60,16 +62,16 @@ class BooksService():
         row = await self.db.fetchone(sql, params)
         return row
 
-    async def get_book_file(self, book_id: int) -> dict:
+    async def get_book_files(self, book_id: int) -> dict:
         sql = """
         SELECT 
-            book.book_file_id
-        FROM books book
-        WHERE book.id = ?
+            book.file_id
+        FROM book_files book
+        WHERE book.book_id = ?
         """
 
         params = (book_id, )
-        row = await self.db.fetchone(sql, params)
+        row = await self.db.fetchall(sql, params)
         return row
 
     async def get_books_count(self) -> dict:
@@ -105,4 +107,18 @@ class BooksService():
         """
         
         row = await self.db.fetchone(sql)
+        return row
+        
+    async def search_book(self, book_name: str) -> list[dict]:
+        sql = """
+        SELECT
+            book.id AS book_id,
+            book.book_name
+        FROM books book
+        WHERE book.book_name LIKE ? || '%';
+        """
+        
+        params = (book_name,)
+        row = await self.db.fetchall(sql, params)
+        
         return row

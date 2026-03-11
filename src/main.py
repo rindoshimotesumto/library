@@ -4,7 +4,7 @@ from os import getenv
 from aiogram import Bot, Dispatcher
 from dotenv import load_dotenv
 
-from bot.handlers import welcome, navigation, menu, book, admin
+from bot.handlers import welcome, navigation, menu, book, admin, search
 from config.logging import logger
 
 from db.database import DataBase
@@ -28,6 +28,7 @@ async def main() -> None:
         navigation.router,
         menu.router,
         book.router,
+        search.router,
         admin.router,
     )
 

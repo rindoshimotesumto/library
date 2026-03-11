@@ -17,6 +17,8 @@ UZ_TEXTS: dict[str, str] = {
     "book:rating": "⭐ Reyting",
     "book:read": "📖 O‘qishni boshlash",
     "book:category": "📚 Kategoriya",
+    "book:like": "❤️",
+    "book:liked": "❤️‍🔥",
     "book:download": "⬇️ Yuklab olish",
 
     # ===== Search =====

@@ -1,11 +1,13 @@
 from aiogram import F, Router
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import CallbackQuery, Message, InputMediaDocument
 
 from bot.ui.inline_kb import back_to_book_list
 from db.database import DataBase
 from db.repo.books import BooksService
 from db.repo.categories import CategoriesService
 from i18n.uz import UZ_TEXTS
+
+from config.logging import logger
 
 router = Router()
 db = DataBase()
@@ -43,6 +45,24 @@ async def book_handler(callback: CallbackQuery):
 
     elif call_data.startswith("download:"):
         book_id = int(call_data.removeprefix("download:"))
-        book_file_id = await books_service.get_book_file(book_id)
-        await callback.message.answer_document(document=book_file_id["book_file_id"])
-
+        book_files_id = await books_service.get_book_files(book_id)
+        
+        if not isinstance(book_files_id, list):
+            return
+        
+        all_media = [InputMediaDocument(media=f["file_id"]) for f in book_files_id]
+        
+        if len(all_media) == 0:
+            return
+        
+        if len(all_media) == 1:
+            await callback.message.answer_document(document=all_media[0].media)
+            
+        else:
+            for i in range(0, len(all_media), 10):
+                chunk = all_media[i:i + 10]
+                
+                if len(chunk) > 1:
+                    await callback.message.answer_media_group(media=chunk)
+                else:
+                    await callback.message.answer_document(document=chunk[0].media)
