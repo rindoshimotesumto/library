@@ -32,13 +32,13 @@ async def book_handler(callback: CallbackQuery):
         keyboard = await back_to_book_list(book_info["id"])
 
         text = (
-            f"{UZ_TEXTS['book:title']}: {book_info['book_name']}\n"
-            f"{UZ_TEXTS['book:author']}: {book_info['author_name']}\n"
-            f"{UZ_TEXTS['book:overview']}: {book_info['category_name']}\n\n"
-            f"{UZ_TEXTS['book:description']}: {book_info['description']}"
+            f"{UZ_TEXTS['book:title']}: <b>{book_info['book_name']}</b>\n"
+            f"{UZ_TEXTS['book:author']}: <b>{book_info['author_name']}</b>\n"
+            f"{UZ_TEXTS['book:category']}: <b>{book_info['category_name']}</b>\n\n"
+            f"{UZ_TEXTS['book:description']}: <i>{book_info['description']}</i>"
         )
 
-        await callback.message.answer_photo(photo=book_info["cover_file_id"], caption=text, reply_markup=keyboard)
+        await callback.message.answer_photo(photo=book_info["cover_file_id"], caption=text, reply_markup=keyboard, parse_mode="html")
         await callback.message.delete()
 
     elif call_data.startswith("download:"):

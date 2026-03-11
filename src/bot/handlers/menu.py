@@ -31,9 +31,14 @@ async def callback_h(callback: CallbackQuery):
 
     if call_data == "books":
         book_list = await books_service.get_books()
+        next_book_id = None
 
         if book_list:
-            books_kb = await show_book_list(book_list)
+            if len(book_list) > 3:
+                book_list = book_list[:-1]
+                next_book_id = book_list[-1]["book_id"]
+                
+            books_kb = await show_book_list(book_list, next_book_id)
             await callback.message.answer(UZ_TEXTS["books:list"], reply_markup=books_kb)
             await callback.message.delete()
             return

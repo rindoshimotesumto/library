@@ -16,6 +16,7 @@ UZ_TEXTS: dict[str, str] = {
     "book:year": "📅 Nashr yili",
     "book:rating": "⭐ Reyting",
     "book:read": "📖 O‘qishni boshlash",
+    "book:category": "📚 Kategoriya",
     "book:download": "⬇️ Yuklab olish",
 
     # ===== Search =====

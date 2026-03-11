@@ -50,18 +50,29 @@ async def back_to_book_list(book_file_id: str) -> InlineKeyboardMarkup:
     return builder.as_markup()
     
 
-async def show_book_list(book_list: list[dict]) -> InlineKeyboardMarkup:
+async def show_book_list(book_list: list[dict], next_book_id: int | None = None, prev_book_id: int | None = None) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
     for book in book_list:
-
         builder.row(
             InlineKeyboardButton(text=f"📖 {book['book_name']}", callback_data=f"book:id:{book['book_id']}")
         )
+        
+    back_btn_call = "back:menu"
+    txt = UZ_BTNS["navigation_menu"]["back"]
+    
+    if isinstance(prev_book_id, int):
+        back_btn_call = f"prev:books:{prev_book_id}"
+        txt = UZ_BTNS["navigation_menu"]["previous"]
 
     builder.row(
-        InlineKeyboardButton(text=UZ_BTNS["navigation_menu"]["back"], callback_data="back:menu")
+        InlineKeyboardButton(text=txt, callback_data=back_btn_call)
     )
-
+    
+    if isinstance(next_book_id, int):
+        builder.row(
+            InlineKeyboardButton(text=UZ_BTNS["navigation_menu"]["next"], callback_data=f"next:book:{next_book_id}")
+        )
+        
     builder.adjust(*([1]*len(book_list)), 2)
     return builder.as_markup()

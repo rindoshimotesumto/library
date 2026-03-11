@@ -23,12 +23,18 @@ class BooksService():
         params = ()
 
         if book_id:
-            sql += """
-            WHERE book.id < ?
-            """
+            min_book_id = await self.get_min_id()
+            if book_id == min_book_id["book_id"]:
+                sql += """
+                    WHERE book.id > ?
+                """
+            else:
+                sql += """
+                WHERE book.id < ?
+                """
             params = (book_id, )
 
-        sql += "\nORDER BY book.id DESC\nLIMIT 3"
+        sql += "\nORDER BY book.id DESC\nLIMIT 4"
         row = await self.db.fetchall(sql, params)
         return row
 
@@ -76,3 +82,27 @@ class BooksService():
 
         rows = await self.db.fetchone(sql)
         return rows
+        
+    async def get_min_id(self) -> dict:
+        sql = """
+        SELECT
+            book.id AS book_id
+        FROM books book
+        ORDER BY book.id ASC
+        LIMIT 1
+        """
+        
+        row = await self.db.fetchone(sql)
+        return row
+        
+    async def get_max_id(self) -> dict:
+        sql = """
+        SELECT
+            book.id AS book_id
+        FROM books book
+        ORDER BY book.id DESC
+        LIMIT 1
+        """
+        
+        row = await self.db.fetchone(sql)
+        return row

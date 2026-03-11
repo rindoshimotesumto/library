@@ -20,5 +20,5 @@ async def answer_photo_id(message: Message):
 
 
 @router.message(F.document)
-async def answer_photo_id(message: Message):
+async def answer_document_id(message: Message):
     await message.answer(message.document.file_id)
