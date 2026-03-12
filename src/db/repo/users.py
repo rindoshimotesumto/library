@@ -1,17 +1,12 @@
-from db.database import DataBase
 
-class UsersService():
-    def __init__(self, db: DataBase) -> None:
+class UsersRepository:
+    def __init__(self, db):
         self.db = db
 
-    async def get_role(self, tg_id: int) -> dict:
+    async def add_user(self, tg_id: int):
         sql = """
-        SELECT
-            users.role
-        FROM users
-        WHERE users.tg_id = ?
+        INSERT INTO users (tg_id) VALUES (?)
         """
 
         params = (tg_id,)
-        row = await self.db.fetchone(sql, params)
-        return row
+        await self.db.execute(sql, params)

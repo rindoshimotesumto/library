@@ -1,60 +1,29 @@
-from db.database import DataBase
 
-class CategoriesService():
-    def __init__(self, db: DataBase) -> None:
+class CategoriesRepository:
+    def __init__(self, db):
         self.db = db
-    
-    async def has_categories(self) -> bool:
-        sql = "SELECT 1 FROM categories LIMIT 1"
-        
-        row = await self.db.fetchone(sql)
-        return bool(row)
-        
-    async def get_categories(self, category_id: int | None = None) -> list[dict]:
-        sql = """
-        SELECT
-          category.id AS category_id,
-          category.category_name
-        FROM categories category
-        """
-        params = ()
 
-        if category_id:
-            min_category_id = await self.get_min_id()
-            if category_id == min_category_id["category_id"]:
-                sql += """
-                    WHERE category.id > ?
-                """
-            else:
-                sql += """
-                WHERE category.id < ?
-                """
-            params = (category_id, )
+    async def add_category(self, category_name: str):
+        sql = """
+        INSERT INTO categories (category_name) VALUES (?)
+        """
 
-        sql += "\nORDER BY category.id DESC\nLIMIT 4"
-        row = await self.db.fetchall(sql, params)
-        return row
-        
-    async def get_min_id(self) -> dict:
+        params = (category_name,)
+        await self.db.execute(sql, params)
+
+    async def get_categories(self,  last_id: int | None = None, PAGE_SIZE: int = 50):
         sql = """
-        SELECT
-            category.id AS category_id
-        FROM categories category
-        ORDER BY category.id ASC
-        LIMIT 1
+        SELECT categories.id, categories.category_name
+            FROM categories
         """
-        
-        row = await self.db.fetchone(sql)
-        return row
-        
-    async def get_max_id(self) -> dict:
-        sql = """
-        SELECT
-            category.id AS category_id
-        FROM categories category
-        ORDER BY category.id DESC
-        LIMIT 1
-        """
-        
-        row = await self.db.fetchone(sql)
+        params = []
+
+        if last_id:
+            sql += "WHERE categories.id > ?"
+            params.append(last_id)
+
+        sql += "ORDER BY categories.id DESC LIMIT ?"
+        params.append(PAGE_SIZE)
+
+        row = await self.db.fetchall(sql, tuple(params))
         return row

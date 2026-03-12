@@ -1,6 +1,6 @@
 from pathlib import Path
-from db.database import DataBase
-from config.logging import logger
+from src.db.database import DataBase
+from src.config.conf_logs import logger
 
 MIGRATIONS_DIR = Path(__file__).parent
 
@@ -20,8 +20,8 @@ async def run_migrations(db: DataBase) -> None:
     for query in tables:
         try:
             await db.executescript(query)
-            logger.info("[✅] Applied migration")
-        
+            logger.info(f"GOOD [✅]")
+
         except Exception:
-            logger.error("[❌] Migration failed", exc_info=True)
+            logger.error(f"FAIL [❌]", exc_info=True)
             raise

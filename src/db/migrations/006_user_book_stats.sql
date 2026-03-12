@@ -1,21 +1,22 @@
 CREATE TABLE IF NOT EXISTS user_book_stats (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    tg_id INTEGER NOT NULL,
 
-    book_id INTEGER NOT NULL,
-    book_category_id INTEGER NOT NULL,
-    liked INTEGER NOT NULL,
-    watched INTEGER NOT NULL,
-    read INTEGER NOT NULL,
-    listened INTEGER NOT NULL,
-    listening INTEGER NOT NULL,
-    i_want_to_listen INTEGER NOT NULL,
-    downloaded INTEGER NOT NULL,
-    
+    book_id INTEGER,
+    book_category_id INTEGER,
+    liked INTEGER DEFAULT 0,
+    watched INTEGER DEFAULT 0,
+    read INTEGER DEFAULT 0,
+    listened INTEGER DEFAULT 0,
+    listening INTEGER DEFAULT 0,
+    i_want_to_listen INTEGER DEFAULT 0,
+    downloaded INTEGER DEFAULT 0,
+
     FOREIGN KEY (book_id)
         REFERENCES books(id)
         ON DELETE RESTRICT
         ON UPDATE CASCADE,
-        
+
     FOREIGN KEY (book_category_id)
         REFERENCES categories(id)
         ON DELETE RESTRICT
