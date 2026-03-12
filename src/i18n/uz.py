@@ -33,6 +33,7 @@ UZ_TEXTS: dict[str, str] = {
         "📅 <b>Nashr yili:</b> {year}\n"
         "⭐ <b>Reyting:</b> {rating}/5\n\n"
         "📝 <b>Tavsif:</b>\n<i>{description}</i>"
+        "🔗 <b><a href={link}>Havola</a></b>"
     ),
 
     # --- Раздел: Категории (category) ---
@@ -66,9 +67,9 @@ UZ_TEXTS: dict[str, str] = {
     "admin:prompt_book_lang": "🌐 Kitob tilini kiriting (masalan, <i>uz, ru, en</i>):",
     "admin:prompt_book_category": "📂 Ushbu kitob uchun kategoriyani tanlang:",
     "admin:prompt_book_author": "✍️ Kitob muallifini tanlang:",
-    "admin:prompt_book_file": "📁 Kitob faylini (PDF/EPUB) (1ta) yuboring:",
+    "admin:prompt_book_file": "📁 Kitob audio fayl(larini\'ni) yuboring:",
     "admin:prompt_book_cover": "🖼 Endi kitob muqovasini (rasm) yuboring:",
-
+    "admin:prompt_book_link": "🔗 Kitob fayliga havola yuboring.\n\nNamuna: https://t.me/c/...",
     "admin:err_not_photo": "⚠️ Iltimos, hujjat (document) emas, oddiy rasm (photo) yuboring!",
     "admin:msg_cover_saved": "✅ Muqova qabul qilindi!",
     "admin:msg_book_added": "✅ <b>Kitob muvaffaqiyatli bazaga qo‘shildi!</b>",
@@ -96,20 +97,20 @@ UZ_BTNS: dict[str, dict[str, str]] = {
 
     # --- Главные меню ---
     "menu:main": {
-        "menu:books": "📖 Kitoblar",
+        # "menu:books": "📖 Kitoblar",
         "menu:categories": "🗂 Kategoriyalar",
-        "menu:search": "🔎 Qidirish",
-        "menu:profile": "👤 Profil",
-        "menu:help": "❓ Yordam",
+        # "menu:search": "🔎 Qidirish",
+        # "menu:profile": "👤 Profil",
+        # "menu:help": "❓ Yordam",
     },
 
     "menu:admin": {
         "admin:b:add": "➕ Kitob qo‘shish",
-        "admin:b:del": "🗑 Kitob o‘chirish",
+        # "admin:b:del": "🗑 Kitob o‘chirish",
         "admin:c:add": "➕ Kategoriya qo‘shish",
-        "admin:c:del": "🗑 Kategoriya o‘chirish",
-        "admin:a:add": "➕ Muallif qo‘shish",
-        "admin:a:del": "🗑 Muallif o'chirish",
+        # "admin:c:del": "🗑 Kategoriya o‘chirish",
+        # "admin:a:add": "➕ Muallif qo‘shish",
+        # "admin:a:del": "🗑 Muallif o'chirish",
     },
 
     # --- Навигация (Универсальная) ---

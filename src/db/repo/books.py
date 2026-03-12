@@ -6,7 +6,8 @@ from typing import Optional
 @dataclass
 class Book:
     category_id: int
-    author_id: int
+    # author_id: int
+    book_file_link: str
     cover_file_id: str
     book_name: str
     description: str
@@ -23,13 +24,13 @@ class BookRepository:
 
     async def add_book(self, book: Book) -> int:
         sql = """
-        INSERT INTO books (category_id, author_id, cover_file_id, book_name,
+        INSERT INTO books (category_id, book_file_link, cover_file_id, book_name,
                             description, year_of_publication, weight, language, rating)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id
         """
 
         params = (
-            book.category_id, book.author_id, book.cover_file_id,
+            book.category_id, book.book_file_link, book.cover_file_id,
             book.book_name, book.description, book.year_of_publication,
             book.weight, book.language, book.rating
         )
@@ -43,14 +44,15 @@ class BookRepository:
 
     async def get_book(self, book_id: int) -> Book | None:
         sql = """
-        SELECT id,
-               category_id,
-               author_id,
-               cover_file_id,
-               book_name,
-               description,
-               year_of_publication,
-               weight, language, rating
+        SELECT 
+            id,
+            category_id,
+            book_file_link,
+            cover_file_id,
+            book_name,
+            description,
+            year_of_publication,
+            weight, language, rating
         FROM books
         WHERE id = ?
         """
@@ -90,7 +92,10 @@ class BookRepository:
             sql += "WHERE books.id > ? AND books.category_id = ?"
             params.append(last_id)
 
-        sql += "ORDER BY books.id DESC LIMIT ?"
+        sql += """
+        WHERE books.category_id = ?
+        ORDER BY books.id DESC LIMIT ?
+        """
         params.append(PAGE_SIZE)
 
         row = await self.db.fetchall(sql, tuple(params))

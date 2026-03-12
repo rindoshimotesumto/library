@@ -40,9 +40,10 @@ async def show_book(call: CallbackQuery, state: FSMContext, db: DataBase):
         f"📚 <b>{book.book_name}</b>\n"
         f"📅 <b>Nashr qilingan yili:</b> {book.year_of_publication}\n\n"
         f"📝 <b>Tavsif:</b> <i>{book.description}</i>\n\n"
+        f"🔗 <b><a href='{book.book_file_link}'>Havola</a></b> | "
         # f"⚖️ <b>Вес:</b> {book.weight}\n"
-        f"🌐 <b>Til:</b> {book.language}\n"
-        f"⭐️ <b>Reyting:</b> {book.rating}/5.0"
+        f"🌐 <b>{book.language}</b> | "
+        f"⭐️ <b>{book.rating}/5.0</b>"
     )
 
     try:

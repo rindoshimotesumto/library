@@ -31,13 +31,18 @@ async def books_keyboard(books: list[dict]) -> InlineKeyboardMarkup:
     return builder.as_markup()
 
 
-async def categories_keyboard(categories: list[dict]) -> InlineKeyboardMarkup:
+async def categories_keyboard(categories: list[dict], add: bool = False) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
+
+    call = "category:show:"
+
+    if add:
+        call = "menu:category:show:"
 
     for category in categories:
         builder.button(
             text=f"📚 {category['category_name']}",
-            callback_data=f"category:show:{category['id']}",
+            callback_data=f"{call}{category['id']}",
         )
 
     builder.adjust(1)

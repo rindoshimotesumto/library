@@ -8,8 +8,8 @@ from src.config.conf_logs import logger
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 
-from src.bot.handlers import welcome, books, navigation
-from src.bot.handlers.admin import add_book, add_category, add_author
+from src.bot.handlers import welcome, books, navigation, categories
+from src.bot.handlers.admin import add_book, add_category
 from src.bot.middlewares.middlewares import DbMiddleware
 
 from src.db.database import DataBase
@@ -29,12 +29,13 @@ async def main() -> None:
         return
 
     dp.include_routers(
+        add_category.router,
         welcome.router,
         books.router,
+        categories.router,
         navigation.router,
         add_book.router,
-        add_category.router,
-        add_author.router,
+        # add_author.router,
     )
 
     await run_migrations(db)
