@@ -121,7 +121,7 @@ async def book_weight(message: Message, state: FSMContext, db: DataBase):
 
 # === 10. ФАЙЛЫ (Любое количество) ===
 @router.message(AddBook.book_files_list)
-async def book_files(message: types.Message, state: FSMContext):
+async def book_files(message: Message, state: FSMContext):
     # 1. Обработка кнопки "Keyingisi ➡️"
     if message.text == "Keyingisi ➡️":
         data = await state.get_data()
