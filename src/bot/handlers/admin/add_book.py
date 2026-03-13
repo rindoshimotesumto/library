@@ -19,7 +19,7 @@ from src.bot.keyboards.reply import next_state
 from src.config.conf_logs import logger
 
 router = Router()
-TG_INTERNAL_LINK = r'https?://t\.me/c/\d+/\d+/\d+'
+TG_INTERNAL_LINK = r'https?://t\.me/c/\d+/\d+(?:/\d+)?'
 
 # === 1. СТАРТ ===
 @router.callback_query(F.data == "admin:b:add")
@@ -41,25 +41,24 @@ async def book_category(call: CallbackQuery, state: FSMContext, db: DataBase):
     await call.answer()
     await state.update_data(category_id=int(call.data.removeprefix("category:show:")))
 
-    # authors_repo = AuthorRepository(db)
-    # authors = await authors_repo.get_authors()
+    authors_repo = AuthorRepository(db)
+    authors = await authors_repo.get_authors()
 
-    # await call.message.edit_text(
-    #     UZ_TEXTS["admin:prompt_book_author"],
-    #     reply_markup=await authors_keyboard(authors)
-    # )
+    await call.message.edit_text(
+        UZ_TEXTS["admin:prompt_book_author"],
+        reply_markup=await authors_keyboard(authors)
+    )
 
-    await call.message.answer(UZ_TEXTS["admin:prompt_book_cover"])
-    await state.set_state(AddBook.cover_file_id)
+    await state.set_state(AddBook.author_id)
 
 
 # === 3. АВТОР ===
-# @router.callback_query(AddBook.author_id)
-# async def book_author(call: CallbackQuery, state: FSMContext, db: DataBase):
-#     await call.answer()
-#     await state.update_data(author_id=int(call.data.removeprefix("author:")))
-#     await call.message.answer(UZ_TEXTS["admin:prompt_book_cover"])
-#     await state.set_state(AddBook.cover_file_id)
+@router.callback_query(AddBook.author_id)
+async def book_author(call: CallbackQuery, state: FSMContext, db: DataBase):
+    await call.answer()
+    await state.update_data(author_id=int(call.data.removeprefix("author:")))
+    await call.message.edit_text(UZ_TEXTS["admin:prompt_book_cover"])
+    await state.set_state(AddBook.cover_file_id)
 
 
 # === 4. ОБЛОЖКА (Только фото!) ===
@@ -83,8 +82,8 @@ async def book_cover_invalid(message: Message):
 @router.message(AddBook.book_name)
 async def book_name(message: Message, state: FSMContext, db: DataBase):
     await state.update_data(book_name=message.text)
-    await message.answer(UZ_TEXTS["admin:prompt_book_desc"])
-    await state.set_state(AddBook.description)
+    await message.answer(UZ_TEXTS["admin:prompt_book_year"]) #await message.answer(UZ_TEXTS["admin:prompt_book_desc"])
+    await state.set_state(AddBook.year_of_publication)
 
 
 # === 6. ОПИСАНИЕ ===
@@ -98,6 +97,9 @@ async def book_description(message: Message, state: FSMContext, db: DataBase):
 # === 7. ГОД ИЗДАНИЯ ===
 @router.message(AddBook.year_of_publication)
 async def book_year_of_publication(message: Message, state: FSMContext, db: DataBase):
+
+    await state.update_data(description="-")
+
     if not message.text.isdigit():
         return await message.answer(UZ_TEXTS["admin:err_invalid_number"])
 
@@ -173,7 +175,7 @@ async def book_files(message: Message, state: FSMContext):
 
     # 6. Финальное действие после загрузки всех файлов
     total_files = len(new_data.get("book_files_list", []))
-    await message.answer(f"UZ_TEXTS['admin:prompt_book_link'] ({total_files} ✅)",
+    await message.answer(f"{UZ_TEXTS['admin:prompt_book_link']} ({total_files} ✅)",
                          reply_markup=ReplyKeyboardRemove())
     await state.set_state(AddBook.book_file_link)
 
@@ -181,20 +183,19 @@ async def book_files(message: Message, state: FSMContext):
 # === 10. Линк к файлу из супер группы ===
 @router.message(AddBook.book_file_link, F.text)
 async def process_tg_link(message: Message, state: FSMContext, db: DataBase):
-    # Ищем ссылку в тексте сообщения
     match = re.search(TG_INTERNAL_LINK, message.text)
 
     if not match:
         await message.answer(
             "❌ Havola formati noto'g'ri.\n"
-            "Topicdagi xabarga havolani yuboring (masalan, https://t.me/c/...)"
+            "Topicdagi fayl havolasini yuboring\n"
+            "Masalan: https://t.me/c/123456/789"
         )
         return
 
-    # Берем найденную ссылку (только одну)
+    # Берем найденную ссылку
     book_link = match.group(0)
 
-    # Сохраняем как обычную строку, а не список
     await state.update_data(
         book_file_link=book_link,
         language="uz"
@@ -206,7 +207,7 @@ async def process_tg_link(message: Message, state: FSMContext, db: DataBase):
     # 3. Формируем объект датакласса
     new_book = Book(
         category_id=data["category_id"],
-        # author_id=data["author_id"],
+        author_id=data["author_id"],
         book_file_link=data["book_file_link"],
         cover_file_id=data["cover_file_id"],
         book_name=data["book_name"],

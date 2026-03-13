@@ -10,7 +10,7 @@ from src.db.repo.categories import CategoriesRepository
 router = Router()
 
 @router.callback_query(F.data == "admin:c:add")
-async def add_category(call: Message, state: FSMContext, db: DataBase):
+async def add_category(call: CallbackQuery, state: FSMContext, db: DataBase):
     await state.clear()
     await call.message.edit_text(UZ_TEXTS["admin:prompt_category_name"])
     await state.set_state(AddCategory.category_name)

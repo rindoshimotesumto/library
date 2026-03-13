@@ -9,7 +9,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 
 from src.bot.handlers import welcome, books, navigation, categories
-from src.bot.handlers.admin import add_book, add_category
+from src.bot.handlers.admin import add_book, add_category, add_author
 from src.bot.middlewares.middlewares import DbMiddleware
 
 from src.db.database import DataBase
@@ -35,7 +35,7 @@ async def main() -> None:
         categories.router,
         navigation.router,
         add_book.router,
-        # add_author.router,
+        add_author.router,
     )
 
     await run_migrations(db)

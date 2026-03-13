@@ -109,7 +109,7 @@ UZ_BTNS: dict[str, dict[str, str]] = {
         # "admin:b:del": "🗑 Kitob o‘chirish",
         "admin:c:add": "➕ Kategoriya qo‘shish",
         # "admin:c:del": "🗑 Kategoriya o‘chirish",
-        # "admin:a:add": "➕ Muallif qo‘shish",
+        "admin:a:add": "➕ Muallif qo‘shish",
         # "admin:a:del": "🗑 Muallif o'chirish",
     },
 

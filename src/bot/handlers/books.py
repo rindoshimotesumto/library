@@ -7,6 +7,8 @@ from src.bot.keyboards.inline import books_keyboard
 from src.db.repo.books import BookRepository
 from src.db.database import DataBase
 
+from src.config.conf_logs import logger
+
 router = Router()
 
 @router.callback_query(F.data == "menu:books")
@@ -37,13 +39,12 @@ async def show_book(call: CallbackQuery, state: FSMContext, db: DataBase):
         return
 
     caption = (
-        f"📚 <b>{book.book_name}</b>\n"
-        f"📅 <b>Nashr qilingan yili:</b> {book.year_of_publication}\n\n"
-        f"📝 <b>Tavsif:</b> <i>{book.description}</i>\n\n"
-        f"<b><a href='{book.book_file_link}'>🔗 Havola</a></b> | "
-        # f"⚖️ <b>Вес:</b> {book.weight}\n"
-        f"{LANGS_FORMAT[book.language]} | "
-        f"⭐️ <b>{book.rating} </b>"
+        f"<b>{book.book_name} 📚</b>\n"
+        f"<b>👤 Muallif: <i>{book.author_id}</i></b>\n"
+        f"<b>🗓 Nashr qilingan yil: {book.year_of_publication}</b>\n\n"
+        f"<b>Til: {LANGS_FORMAT[book.language]}  /  </b>"
+        f"<b>Reyting: {book.rating} ⭐️  /  </b>"
+        f"<b><a href='{book.book_file_link}'>Havola 🔗</a></b>"
     )
 
     try:
@@ -54,6 +55,7 @@ async def show_book(call: CallbackQuery, state: FSMContext, db: DataBase):
 
     except Exception as e:
         await call.message.edit_text(text=caption)
+        logger.info(f"{e}")
 
     await call.message.delete()
 
