@@ -104,8 +104,8 @@ async def book_year_of_publication(message: Message, state: FSMContext, db: Data
     await state.update_data(year_of_publication=int(message.text))
 
     # Добавил пропущенный вопрос про вес
-    await message.answer(UZ_TEXTS["admin:prompt_book_weight"])
-    await state.set_state(AddBook.weight)
+    await message.answer(UZ_TEXTS["admin:prompt_book_file"], reply_markup=await next_state())
+    await state.set_state(AddBook.book_files_list)
 
 
 # === 8. КОЛ-ВО СТРАНИЦ ===
@@ -123,6 +123,8 @@ async def book_weight(message: Message, state: FSMContext, db: DataBase):
 @router.message(AddBook.book_files_list)
 async def book_files(message: Message, state: FSMContext):
     # 1. Обработка кнопки "Keyingisi ➡️"
+    await state.update_data(weight=1)
+
     if message.text == "Keyingisi ➡️":
         data = await state.get_data()
         file_list = data.get("book_files_list", [])
@@ -131,7 +133,7 @@ async def book_files(message: Message, state: FSMContext):
         if not file_list:
             await state.update_data(book_files_list="None")
 
-        await message.answer(UZ_TEXTS['admin:prompt_book_link'])
+        await message.answer(UZ_TEXTS['admin:prompt_book_link'], reply_markup=ReplyKeyboardRemove())
         await state.set_state(AddBook.book_file_link)
         return
 
@@ -171,14 +173,14 @@ async def book_files(message: Message, state: FSMContext):
 
     # 6. Финальное действие после загрузки всех файлов
     total_files = len(new_data.get("book_files_list", []))
-    await message.answer(f"✅ {total_files} ta fayl qabul qilindi.\n" + UZ_TEXTS['admin:prompt_book_link'],
+    await message.answer(f"UZ_TEXTS['admin:prompt_book_link'] ({total_files} ✅)",
                          reply_markup=ReplyKeyboardRemove())
     await state.set_state(AddBook.book_file_link)
 
 
 # === 10. Линк к файлу из супер группы ===
 @router.message(AddBook.book_file_link, F.text)
-async def process_tg_link(message: Message, state: FSMContext):
+async def process_tg_link(message: Message, state: FSMContext, db: DataBase):
     # Ищем ссылку в тексте сообщения
     match = re.search(TG_INTERNAL_LINK, message.text)
 
@@ -193,18 +195,10 @@ async def process_tg_link(message: Message, state: FSMContext):
     book_link = match.group(0)
 
     # Сохраняем как обычную строку, а не список
-    await state.update_data(book_file_link=book_link)
-
-    # Уведомляем и идем к следующему шагу
-    await message.answer(UZ_TEXTS["admin:prompt_book_lang"])
-    await state.set_state(AddBook.language)
-
-
-# === 11. ЯЗЫК (ФИНАЛ: СОХРАНЕНИЕ В БД) ===
-@router.message(AddBook.language)
-async def book_language(message: Message, state: FSMContext, db: DataBase):
-    # 1. Сохраняем последний ответ (язык)
-    await state.update_data(language=message.text)
+    await state.update_data(
+        book_file_link=book_link,
+        language="uz"
+    )
 
     # 2. Получаем все собранные данные
     data = await state.get_data()
@@ -240,3 +234,45 @@ async def book_language(message: Message, state: FSMContext, db: DataBase):
         logger.info(f"[{message.from_user.username}] / {e}")
         await message.answer(UZ_TEXTS["error:db_error"])
         return
+
+
+# # === 11. ЯЗЫК (ФИНАЛ: СОХРАНЕНИЕ В БД) ===
+# @router.message(AddBook.language)
+# async def book_language(message: Message, state: FSMContext, db: DataBase):
+#     # 1. Сохраняем последний ответ (язык)
+#     await state.update_data(language="uz")
+#
+#     # 2. Получаем все собранные данные
+#     data = await state.get_data()
+#
+#     # 3. Формируем объект датакласса
+#     new_book = Book(
+#         category_id=data["category_id"],
+#         # author_id=data["author_id"],
+#         book_file_link=data["book_file_link"],
+#         cover_file_id=data["cover_file_id"],
+#         book_name=data["book_name"],
+#         description=data["description"],
+#         year_of_publication=data["year_of_publication"],
+#         weight=data["weight"],
+#         language=data["language"],
+#         rating=0.0  # По умолчанию при создании
+#     )
+#
+#     logger.info(f"data: {data}")
+#     await state.clear()
+#
+#     repo = BookRepository(db)
+#     try:
+#         book_id = await repo.add_book(new_book)
+#
+#         if not isinstance(data["book_files_list"], str):
+#             for book_file in data["book_files_list"]:
+#                 await repo.add_book_file(book_id, book_file)
+#
+#         await message.answer(UZ_TEXTS["admin:msg_book_added"])
+#
+#     except Exception as e:
+#         logger.info(f"[{message.from_user.username}] / {e}")
+#         await message.answer(UZ_TEXTS["error:db_error"])
+#         return

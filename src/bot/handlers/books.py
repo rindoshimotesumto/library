@@ -2,7 +2,7 @@ from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
 
-from src.i18n.uz import UZ_TEXTS
+from src.i18n.uz import UZ_TEXTS, LANGS_FORMAT
 from src.bot.keyboards.inline import books_keyboard
 from src.db.repo.books import BookRepository
 from src.db.database import DataBase
@@ -40,10 +40,10 @@ async def show_book(call: CallbackQuery, state: FSMContext, db: DataBase):
         f"📚 <b>{book.book_name}</b>\n"
         f"📅 <b>Nashr qilingan yili:</b> {book.year_of_publication}\n\n"
         f"📝 <b>Tavsif:</b> <i>{book.description}</i>\n\n"
-        f"🔗 <b><a href='{book.book_file_link}'>Havola</a></b> | "
+        f"<b><a href='{book.book_file_link}'>🔗 Havola</a></b> | "
         # f"⚖️ <b>Вес:</b> {book.weight}\n"
-        f"🌐 <b>{book.language}</b> | "
-        f"⭐️ <b>{book.rating}/5.0</b>"
+        f"{LANGS_FORMAT[book.language]} | "
+        f"⭐️ <b>{book.rating} </b>"
     )
 
     try:

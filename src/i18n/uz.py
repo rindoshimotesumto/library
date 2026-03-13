@@ -130,3 +130,11 @@ UZ_BTNS: dict[str, dict[str, str]] = {
         "liked": "❤️ Yoqtirganlarda",
     }
 }
+
+
+
+LANGS_FORMAT = {
+    "uz": "🇺🇿",
+    "ru": "🇷🇺",
+    "en": "🇺🇸"
+}
