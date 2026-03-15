@@ -1,5 +1,27 @@
 from aiogram.utils.keyboard import InlineKeyboardMarkup, InlineKeyboardButton, InlineKeyboardBuilder
+
+from src.config.conf_logs import logger
 from src.i18n.uz import UZ_BTNS
+
+async def back_btn(builder: InlineKeyboardBuilder, to: str = "main"):
+
+    btn = {}
+    btn_txt = "⬅️"
+
+    if to == "main":
+        btn["menu:main"] = btn_txt
+
+    elif to == "admin":
+        btn["menu:admin"] = btn_txt
+
+    elif to == "categories":
+        btn["menu:categories"] = btn_txt
+
+    for call_data, btn_text in btn.items():
+        builder.button(
+            text=btn_text,
+            callback_data=call_data,
+        )
 
 async def main_menu(admin: bool) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
@@ -27,11 +49,13 @@ async def books_keyboard(books: list[dict]) -> InlineKeyboardMarkup:
             callback_data=f"book:show:{book['id']}",
         )
 
-    builder.adjust(1)
+    await back_btn(builder, "categories")
+
+    builder.adjust(2)
     return builder.as_markup()
 
 
-async def categories_keyboard(categories: list[dict], add: bool = False) -> InlineKeyboardMarkup:
+async def categories_keyboard(categories: list[dict], add: bool = False, to: str = "main") -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
     call = "category:show:"
@@ -39,13 +63,18 @@ async def categories_keyboard(categories: list[dict], add: bool = False) -> Inli
     if add:
         call = "menu:category:show:"
 
+    if len(categories) > 8:
+        categories = categories[:-1]
+
     for category in categories:
         builder.button(
             text=f"📚 {category['category_name']}",
             callback_data=f"{call}{category['id']}",
         )
 
-    builder.adjust(1)
+    await back_btn(builder, to)
+
+    builder.adjust(2)
     return builder.as_markup()
 
 

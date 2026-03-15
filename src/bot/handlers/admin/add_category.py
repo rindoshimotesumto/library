@@ -6,6 +6,7 @@ from src.db.database import DataBase
 from src.i18n.uz import UZ_TEXTS
 from src.bot.states.add import AddCategory
 from src.db.repo.categories import CategoriesRepository
+from src.bot.keyboards.inline import main_menu
 
 router = Router()
 
@@ -22,7 +23,7 @@ async def prompt_category_name(message: Message, state: FSMContext, db: DataBase
 
     try:
         await categories_repo.add_category(message.text)
-        await message.answer(UZ_TEXTS["admin:msg_category_added"])
+        await message.answer(UZ_TEXTS["admin:msg_category_added"], reply_markup=await main_menu(True))
 
     except Exception as e:
         await message.answer(UZ_TEXTS["error:db_error"])

@@ -6,6 +6,7 @@ from src.db.database import DataBase
 from src.i18n.uz import UZ_TEXTS
 from src.bot.states.add import AddAuthor
 from src.db.repo.authors import AuthorRepository
+from src.bot.keyboards.inline import main_menu
 
 router = Router()
 
@@ -22,10 +23,10 @@ async def prompt_category_name(message: Message, state: FSMContext, db: DataBase
 
     try:
         await author_repo.add_author(message.text.title())
-        await message.answer(UZ_TEXTS["admin:msg_author_added"])
+        await message.answer(UZ_TEXTS["admin:msg_author_added"], reply_markup=await main_menu(True))
 
     except Exception as e:
-        await message.answer(UZ_TEXTS["error:db_error"])
+        await message.answer(UZ_TEXTS["error:db_error"], reply_markup=await main_menu(True))
         return
 
     finally:

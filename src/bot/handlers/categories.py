@@ -2,6 +2,7 @@ from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
 
+from src.config.conf_logs import logger
 from src.i18n.uz import UZ_TEXTS
 from src.bot.keyboards.inline import books_keyboard, categories_keyboard
 from src.db.repo.books import BookRepository
@@ -11,15 +12,18 @@ from src.db.database import DataBase
 
 router = Router()
 
-
-@router.callback_query(F.data == "menu:categories")
+@router.callback_query(F.data.startswith("menu:categories"))
 async def show_categories(callback: CallbackQuery, state: FSMContext, db: DataBase):
     await callback.answer()
+    last_c_id = None
+
+    if callback.data != "menu:categories":
+        last_c_id = int(callback.data.removeprefix("menu:categories:"))
 
     categories_repository = CategoriesRepository(db)
-    categories = await categories_repository.get_categories()
-    categories_kb = await categories_keyboard(categories, True)
+    categories = await categories_repository.get_categories(last_c_id)
 
+    categories_kb = await categories_keyboard(categories, True)
     await callback.message.edit_text(UZ_TEXTS["admin:btn_categories"], reply_markup=categories_kb)
 
 

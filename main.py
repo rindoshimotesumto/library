@@ -31,9 +31,9 @@ async def main() -> None:
     dp.include_routers(
         add_category.router,
         welcome.router,
+        navigation.router,
         books.router,
         categories.router,
-        navigation.router,
         add_book.router,
         add_author.router,
     )
