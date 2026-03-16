@@ -1,9 +1,9 @@
 CREATE TABLE IF NOT EXISTS user_book_stats (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    tg_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
 
-    book_id INTEGER,
-    book_category_id INTEGER,
+    book_id INTEGER NOT NULL,
+    book_category_id INTEGER NOT NULL,
     liked INTEGER DEFAULT 0,
     watched INTEGER DEFAULT 0,
     read INTEGER DEFAULT 0,
@@ -11,6 +11,11 @@ CREATE TABLE IF NOT EXISTS user_book_stats (
     listening INTEGER DEFAULT 0,
     i_want_to_listen INTEGER DEFAULT 0,
     downloaded INTEGER DEFAULT 0,
+
+    FOREIGN KEY (user_id)
+        REFERENCES users(id)
+        ON DELETE RESTRICT
+        ON UPDATE CASCADE,
 
     FOREIGN KEY (book_id)
         REFERENCES books(id)
@@ -22,6 +27,9 @@ CREATE TABLE IF NOT EXISTS user_book_stats (
         ON DELETE RESTRICT
         ON UPDATE CASCADE
 );
+
+CREATE INDEX IF NOT EXISTS idx_user_id
+ON users(id);
 
 CREATE INDEX IF NOT EXISTS idx_book_id
 ON books(id);
