@@ -3,7 +3,7 @@ from aiogram.utils.keyboard import InlineKeyboardMarkup, InlineKeyboardButton, I
 from src.config.conf_logs import logger
 from src.i18n.uz import UZ_BTNS
 
-async def back_btn(builder: InlineKeyboardBuilder, to: str = "main"):
+async def back_btn(builder: InlineKeyboardBuilder, to: str = "main", idx: int | None = None):
 
     btn = {}
     btn_txt = "⬅️"
@@ -16,6 +16,9 @@ async def back_btn(builder: InlineKeyboardBuilder, to: str = "main"):
 
     elif to == "categories":
         btn["menu:categories"] = btn_txt
+
+    elif to == "books":
+        btn[f"menu:category:show:{idx}"] = btn_txt
 
     for call_data, btn_text in btn.items():
         builder.button(
@@ -51,7 +54,7 @@ async def books_keyboard(books: list[dict]) -> InlineKeyboardMarkup:
 
     await back_btn(builder, "categories")
 
-    builder.adjust(2)
+    builder.adjust(*([2]*len(books)), 1)
     return builder.as_markup()
 
 
@@ -63,7 +66,7 @@ async def categories_keyboard(categories: list[dict], add: bool = False, to: str
     if add:
         call = "menu:category:show:"
 
-    if len(categories) > 8:
+    if len(categories) > 50:
         categories = categories[:-1]
 
     for category in categories:
@@ -74,7 +77,7 @@ async def categories_keyboard(categories: list[dict], add: bool = False, to: str
 
     await back_btn(builder, to)
 
-    builder.adjust(2)
+    builder.adjust(*([2]*len(categories)), 1)
     return builder.as_markup()
 
 

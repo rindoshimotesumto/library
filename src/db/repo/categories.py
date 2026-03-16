@@ -11,7 +11,7 @@ class CategoriesRepository:
         params = (category_name,)
         await self.db.execute(sql, params)
 
-    async def get_categories(self,  last_id: int | None = None, PAGE_SIZE: int = 9):
+    async def get_categories(self,  last_id: int | None = None, PAGE_SIZE: int = 50):
         sql = """
         SELECT categories.id, categories.category_name
             FROM categories
