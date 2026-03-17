@@ -1,7 +1,21 @@
+from aiogram.enums import ButtonStyle
 from aiogram.utils.keyboard import InlineKeyboardMarkup, InlineKeyboardButton, InlineKeyboardBuilder
 
 from src.config.conf_logs import logger
 from src.i18n.uz import UZ_BTNS
+
+async def more_btn(builder: InlineKeyboardBuilder, b_id: int, c_id: int, like: bool = False):
+    if like:
+        builder.button(
+            text=UZ_BTNS["book_actions"]["liked"],
+            callback_data=f"book:show:liked:{c_id}:{b_id}",
+        )
+
+    elif not like:
+        builder.button(
+            text=UZ_BTNS["book_actions"]["like"],
+            callback_data=f"book:show:like:{c_id}:{b_id}",
+        )
 
 async def back_btn(builder: InlineKeyboardBuilder, to: str = "main", idx: int | None = None):
 
