@@ -59,28 +59,24 @@ async def backup(message: Message, state: FSMContext, db: DataBase):
 
     if message.from_user.id not in admin:
         try:
-            if await check_user(message, db) == "admin":
-
-                try:
-                    backup_path = await db.backup()
-                    await db.clean_backups()
-                    file = FSInputFile(backup_path)
-
-                    await message.answer_document(file, caption="Backup ✅")
-                    return
-
-                except Exception as e:
-                    await message.answer(f"Backup ⚠️: {str(e)}")
-                    return
-
-            else:
+            if await check_user(message, db) != "admin":
                 await message.answer(UZ_TEXTS["error:access_denied"])
                 return
 
         except Exception as e:
             logger.info(str(e))
 
-    await message.answer(UZ_TEXTS["error:access_denied"])
+    try:
+        backup_path = await db.backup()
+        file = FSInputFile(backup_path)
+
+        await message.answer_document(file, caption="Backup ✅")
+        await db.clean_backups()
+        return
+
+    except Exception as e:
+        await message.answer(f"Backup ⚠️: {str(e)}")
+        return
 
 # @router.message(F.photo)
 # async def cmd_photo(message: Message, db: DataBase):
