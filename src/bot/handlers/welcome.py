@@ -1,5 +1,5 @@
 from aiogram import Router, F
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message, CallbackQuery, FSInputFile
 from aiogram.filters.command import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 
@@ -24,7 +24,6 @@ async def check_user(message: Message, db: DataBase) -> str:
 @router.message(CommandStart())
 async def cmd_start(message: Message, state:FSMContext, db: DataBase):
     await state.clear()
-    await check_user(message, db)
     await message.answer(UZ_TEXTS["common:start"], reply_markup=await main_menu(False))
 
 @router.message(Command("admin"))
@@ -32,15 +31,34 @@ async def cmd_admin(message: Message, state: FSMContext, db: DataBase):
     await state.clear()
 
     if message.from_user.id not in admin:
-        await message.answer(UZ_TEXTS["error:access_denied"])
-
-    else:
         if await check_user(message, db) == "admin":
             await message.answer(UZ_TEXTS["common:start"], reply_markup=await main_menu(True))
             admin.add(message.from_user.id)
 
         else:
             await message.answer(UZ_TEXTS["error:access_denied"])
+
+    else:
+        await message.answer(UZ_TEXTS["common:start"], reply_markup=await main_menu(True))
+
+@router.message(Command("backup"))
+async def backup(message: Message, state: FSMContext, db: DataBase):
+    await state.clear()
+
+    if message.from_user.id not in admin:
+        if await check_user(message, db) == "admin":
+            try:
+                backup_path = await db.backup()
+                await db.clean_backups()
+                file = FSInputFile(backup_path)
+
+                await message.answer(text="Backup ✅")
+
+            except Exception as e:
+                await message.answer(f"Backup ⚠️: {str(e)}")
+        return
+
+    await message.answer(UZ_TEXTS["error:access_denied"])
 
 # @router.message(F.photo)
 # async def cmd_photo(message: Message, db: DataBase):
