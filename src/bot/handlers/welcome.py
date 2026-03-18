@@ -12,14 +12,19 @@ from src.db.repo.users import UsersRepository, User
 from src.config.conf_logs import logger
 
 router = Router()
-admin = set()
+admin = {809673082}
 
 async def check_user(message: Message, db: DataBase) -> str:
     user_repo = UsersRepository(db)
     have_u = await user_repo.get_user(message.from_user.id)
 
     if not have_u:
-        await user_repo.add_user(message.from_user.id, "user", "uz")
+        if message.from_user.id not in admin:
+            role = "user"
+        else:
+            role = "admin"
+
+        await user_repo.add_user(message.from_user.id, role, "uz")
 
     return have_u.role
 
