@@ -25,6 +25,7 @@ async def check_user(message: Message, db: DataBase) -> str:
             role = "admin"
 
         await user_repo.add_user(message.from_user.id, role, "uz")
+        return role
 
     return have_u.role
 
