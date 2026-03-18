@@ -66,7 +66,7 @@ async def backup(message: Message, state: FSMContext, db: DataBase):
                     await db.clean_backups()
                     file = FSInputFile(backup_path)
 
-                    await message.answer(text="Backup ✅")
+                    await message.answer_document(file, caption="Backup ✅")
                     return
 
                 except Exception as e:
