@@ -9,6 +9,8 @@ from src.bot.keyboards.inline import main_menu
 from src.db.database import DataBase
 from src.db.repo.users import UsersRepository, User
 
+from src.config.conf_logs import logger
+
 router = Router()
 admin = set()
 
@@ -31,12 +33,16 @@ async def cmd_admin(message: Message, state: FSMContext, db: DataBase):
     await state.clear()
 
     if message.from_user.id not in admin:
-        if await check_user(message, db) == "admin":
-            await message.answer(UZ_TEXTS["common:start"], reply_markup=await main_menu(True))
-            admin.add(message.from_user.id)
+        try:
+            if await check_user(message, db) == "admin":
+                await message.answer(UZ_TEXTS["common:start"], reply_markup=await main_menu(True))
+                admin.add(message.from_user.id)
 
-        else:
-            await message.answer(UZ_TEXTS["error:access_denied"])
+            else:
+                await message.answer(UZ_TEXTS["error:access_denied"])
+
+        except Exception as e:
+            logger.info(str(e))
 
     else:
         await message.answer(UZ_TEXTS["common:start"], reply_markup=await main_menu(True))
@@ -46,17 +52,27 @@ async def backup(message: Message, state: FSMContext, db: DataBase):
     await state.clear()
 
     if message.from_user.id not in admin:
-        if await check_user(message, db) == "admin":
-            try:
-                backup_path = await db.backup()
-                await db.clean_backups()
-                file = FSInputFile(backup_path)
+        try:
+            if await check_user(message, db) == "admin":
 
-                await message.answer(text="Backup ✅")
+                try:
+                    backup_path = await db.backup()
+                    await db.clean_backups()
+                    file = FSInputFile(backup_path)
 
-            except Exception as e:
-                await message.answer(f"Backup ⚠️: {str(e)}")
-        return
+                    await message.answer(text="Backup ✅")
+                    return
+
+                except Exception as e:
+                    await message.answer(f"Backup ⚠️: {str(e)}")
+                    return
+
+            else:
+                await message.answer(UZ_TEXTS["error:access_denied"])
+                return
+
+        except Exception as e:
+            logger.info(str(e))
 
     await message.answer(UZ_TEXTS["error:access_denied"])
 
