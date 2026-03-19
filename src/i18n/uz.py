@@ -14,6 +14,7 @@ UZ_TEXTS: dict[str, str] = {
     "sub:required": "❌ <b>Kechirasiz, botdan foydalanish uchun kanalimizga a'zo bo'lishingiz kerak!</b>",
     "sub:button_check": "✅ Tekshirish",
     "sub:not_found": "⚠️ Siz hali ham a'zo emassiz! Iltimos, obuna bo'ling.",
+    "sub:kicked": "⛔ Siz guruhdan admin tomonidan chiqarilgansiz, adminga murojaat qiling!",
 
     # --- Ошибки и Статусы (error / success) ---
     "error:not_found": "❌ Ma'lumot topilmadi.",

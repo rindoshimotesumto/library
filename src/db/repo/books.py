@@ -1,7 +1,5 @@
 from dataclasses import dataclass
-from sqlite3.dbapi2 import paramstyle
 from typing import Optional
-
 
 @dataclass
 class Book:

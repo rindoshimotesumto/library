@@ -5,7 +5,7 @@ class AuthorRepository:
 
     async def add_author(self, author_name: str):
         sql = """
-            INSERT INTO authors (author_name) VALUES (?)
+        INSERT INTO authors (author_name) VALUES (?)
         """
 
         params = (author_name,)
@@ -13,8 +13,7 @@ class AuthorRepository:
 
     async def get_authors(self, last_id: int | None = None, PAGE_SIZE: int = 100) -> list[dict]:
         sql = """
-        SELECT *
-        FROM authors
+        SELECT * FROM authors
         """
         params = []
 
