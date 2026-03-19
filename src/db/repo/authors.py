@@ -11,7 +11,7 @@ class AuthorRepository:
         params = (author_name,)
         await self.db.execute(sql, params)
 
-    async def get_authors(self, last_id: int | None = None, PAGE_SIZE: int = 50) -> list[dict]:
+    async def get_authors(self, last_id: int | None = None, PAGE_SIZE: int = 100) -> list[dict]:
         sql = """
         SELECT *
         FROM authors
