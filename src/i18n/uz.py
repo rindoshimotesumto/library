@@ -10,6 +10,11 @@ UZ_TEXTS: dict[str, str] = {
     "common:loading": "⏳ Yuklanmoqda...",
     "common:pagination": "📄 Sahifa: {current}/{total}",
 
+    # --- Majburiy obuna (Обязательная подписка) ---
+    "sub:required": "❌ <b>Kechirasiz, botdan foydalanish uchun kanalimizga a'zo bo'lishingiz kerak!</b>",
+    "sub:button_check": "✅ Tekshirish",
+    "sub:not_found": "⚠️ Siz hali ham a'zo emassiz! Iltimos, obuna bo'ling.",
+
     # --- Ошибки и Статусы (error / success) ---
     "error:not_found": "❌ Ma'lumot topilmadi.",
     "error:access_denied": "⛔ Bu bo‘limga kirish uchun sizda ruxsat yo‘q.",

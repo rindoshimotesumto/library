@@ -1,8 +1,13 @@
-from aiogram.enums import ButtonStyle
 from aiogram.utils.keyboard import InlineKeyboardMarkup, InlineKeyboardButton, InlineKeyboardBuilder
-
+from dataclasses import dataclass
 from src.config.conf_logs import logger
-from src.i18n.uz import UZ_BTNS
+from src.i18n.uz import UZ_BTNS, UZ_TEXTS
+
+@dataclass
+class ChanellInfo:
+    channel_id: int
+    channel_url: str
+    channel_name: str
 
 async def more_btn(builder: InlineKeyboardBuilder, b_id: int, c_id: int, like: bool = False):
     if like:
@@ -105,4 +110,19 @@ async def authors_keyboard(authors: list[dict]) -> InlineKeyboardMarkup:
         )
 
     builder.adjust(1)
+    return builder.as_markup()
+
+async def get_sub_keyboard(chanells_info: list[ChanellInfo]) -> InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+
+    for channel in chanells_info:
+        builder.row(InlineKeyboardButton(
+            text=channel.channel_name,
+            url=channel.channel_url)
+        )
+
+    builder.row(InlineKeyboardButton(
+        text=UZ_TEXTS["sub:button_check"],
+        callback_data="check_sub")
+    )
     return builder.as_markup()

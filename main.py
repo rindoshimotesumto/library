@@ -10,7 +10,7 @@ from aiogram.client.default import DefaultBotProperties
 
 from src.bot.handlers import welcome, books, navigation, categories
 from src.bot.handlers.admin import add_book, add_category, add_author
-from src.bot.middlewares.middlewares import DbMiddleware
+from src.bot.middlewares.middlewares import DbMiddleware, CheckSubscriberMiddleware
 
 from src.db.database import DataBase
 from src.db.migrations.runner import run_migrations
@@ -39,7 +39,9 @@ async def main() -> None:
     )
 
     await run_migrations(db)
-    dp.update.middleware(DbMiddleware(db))
+    dp.message.middleware(CheckSubscriberMiddleware())
+    dp.callback_query.middleware(CheckSubscriberMiddleware())
+    dp.message.middleware(DbMiddleware(db))
     dp.callback_query.middleware(DbMiddleware(db))
 
     bot = Bot(
