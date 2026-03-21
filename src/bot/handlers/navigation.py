@@ -31,8 +31,8 @@ async def check_subscription_callback(callback: CallbackQuery, state: FSMContext
     try:
         member = await bot.get_chat_member(chat_id=channel_id, user_id=callback.from_user.id)
 
-        if member.status in ["member", "administrator", "creator"]:
-            if await check_user(callback.message, db) == "admin":
+        if member.status not in ["left", "kicked"]:
+            if await check_user(callback, db) == "admin":
                 await callback.message.edit_text(UZ_TEXTS["common:start"], reply_markup=await main_menu(True))
             else:
                 await callback.message.edit_text(UZ_TEXTS["common:start"], reply_markup=await main_menu(False))

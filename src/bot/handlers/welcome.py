@@ -14,7 +14,7 @@ from src.config.conf_logs import logger
 router = Router()
 admin = {809673082}
 
-async def check_user(message: Message, db: DataBase) -> str:
+async def check_user(message: Message | CallbackQuery, db: DataBase) -> str:
     user_repo = UsersRepository(db)
     have_u = await user_repo.get_user(message.from_user.id)
 
@@ -48,7 +48,7 @@ async def cmd_admin(message: Message, state: FSMContext, db: DataBase):
                 await message.answer(UZ_TEXTS["error:access_denied"])
 
         except Exception as e:
-            logger.info(str(e))
+            logger.info(e)
 
     else:
         await message.answer(UZ_TEXTS["common:start"], reply_markup=await main_menu(True))
@@ -64,7 +64,7 @@ async def backup(message: Message, state: FSMContext, db: DataBase):
                 return
 
         except Exception as e:
-            logger.info(str(e))
+            logger.info(e)
 
     try:
         backup_path = await db.backup()
