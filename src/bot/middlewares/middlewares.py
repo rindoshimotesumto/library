@@ -46,7 +46,7 @@ class CheckSubscriberMiddleware(BaseMiddleware):
             if member.status not in ["left", "kicked"]:
                 return await handler(event, data)
 
-            if channel_data.get(channel_id, None) is None:
+            if self.channel_data.get(channel_id, None) is None:
                 channel_info = await event.bot.get_chat(chat_id=channel_id)
                 channel_name = channel_info.title
 
@@ -65,7 +65,7 @@ class CheckSubscriberMiddleware(BaseMiddleware):
             await event.bot.send_message(
                 chat_id=user_id,
                 text=UZ_TEXTS["sub:required"],
-                reply_markup=await get_sub_keyboard([ChanellInfo(*channel_data[channel_id])]),
+                reply_markup=await get_sub_keyboard([ChanellInfo(*self.channel_data[channel_id])]),
             )
 
         except Exception as e:
