@@ -71,7 +71,7 @@ async def show_book(call: CallbackQuery, state: FSMContext, db: DataBase):
     if user:
         await stats_repo.apply_action(user.user_id, book_id, book.category_id, StatsField.WATCHED, 1)
     else:
-        logger.info(f"User: {user}")
+        logger.warning(f"User: {user}")
 
     if book is None:
         await call.message.answer("Kitob topilmadi 😔")

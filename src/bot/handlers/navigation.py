@@ -36,6 +36,7 @@ async def check_subscription_callback(callback: CallbackQuery, state: FSMContext
                 await callback.message.edit_text(UZ_TEXTS["common:start"], reply_markup=await main_menu(True))
             else:
                 await callback.message.edit_text(UZ_TEXTS["common:start"], reply_markup=await main_menu(False))
+
         else:
             await callback.answer(
                 text=UZ_TEXTS["sub:not_found"],

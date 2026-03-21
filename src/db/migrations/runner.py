@@ -5,11 +5,11 @@ from src.config.conf_logs import logger
 MIGRATIONS_DIR = Path(__file__).parent
 
 
-def load_sql_files() -> list[str]:
-    queries = []
+def load_sql_files() -> dict[str, str]:
+    queries = {}
 
     for file in sorted(MIGRATIONS_DIR.glob("*.sql")):
-        queries.append(file.read_text())
+        queries[file.name] = file.read_text()
 
     return queries
 
@@ -17,11 +17,11 @@ def load_sql_files() -> list[str]:
 async def run_migrations(db: DataBase) -> None:
     tables = load_sql_files()
 
-    for query in tables:
+    for name, query in tables.items():
         try:
             await db.executescript(query)
-            logger.info(f"GOOD [✅]")
+            logger.info(f"{name} [✅]")
 
         except Exception:
-            logger.error(f"FAIL [❌]", exc_info=True)
+            logger.error(f"{name} [❌]", exc_info=True)
             raise

@@ -196,7 +196,6 @@ async def process_tg_link(message: Message, state: FSMContext, db: DataBase):
         rating=0.0  # По умолчанию при создании
     )
 
-    logger.info(f"data: {data}")
     await state.clear()
 
     repo = BookRepository(db)
@@ -210,6 +209,6 @@ async def process_tg_link(message: Message, state: FSMContext, db: DataBase):
         await message.answer(UZ_TEXTS["admin:msg_book_added"], reply_markup=await main_menu(True))
 
     except Exception as e:
-        logger.info(f"[{message.from_user.username}] / {e}")
+        logger.warning(f"[{message.from_user.username}] / {e}")
         await message.answer(UZ_TEXTS["error:db_error"], reply_markup=await main_menu(True))
         return

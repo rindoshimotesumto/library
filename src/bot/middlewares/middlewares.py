@@ -12,7 +12,6 @@ from src.i18n.uz import UZ_TEXTS
 
 load_dotenv(".env")
 channel_id = os.getenv("CHANNEL_ID")
-channel_data = {}
 
 class DbMiddleware(BaseMiddleware):
     def __init__(self, db):
@@ -29,6 +28,9 @@ class DbMiddleware(BaseMiddleware):
 
 
 class CheckSubscriberMiddleware(BaseMiddleware):
+    def __init__(self):
+        self.channel_data = {}
+
     async def __call__(
             self,
             handler: Callable,
@@ -58,7 +60,7 @@ class CheckSubscriberMiddleware(BaseMiddleware):
                     link_obj = await event.bot.create_chat_invite_link(chat_id=channel_id)
                     channel_link = link_obj.invite_link
 
-                channel_data[channel_id] = [channel_id, channel_link, channel_name]
+                self.channel_data[channel_id] = [channel_id, channel_link, channel_name]
 
             await event.bot.send_message(
                 chat_id=user_id,
@@ -67,5 +69,5 @@ class CheckSubscriberMiddleware(BaseMiddleware):
             )
 
         except Exception as e:
-            logger.info(f"{e} / {channel_id}")
+            logger.warning(f"{e} / {channel_id}")
             return await handler(event, data)
