@@ -32,6 +32,7 @@ async def check_user(message: Message | CallbackQuery, db: DataBase) -> str:
 @router.message(CommandStart())
 async def cmd_start(message: Message, state:FSMContext, db: DataBase):
     await state.clear()
+    await check_user(message, db)
     await message.answer(UZ_TEXTS["common:start"], reply_markup=await main_menu(False))
 
 @router.message(Command("admin"))
