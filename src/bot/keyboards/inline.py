@@ -22,7 +22,21 @@ async def more_btn(builder: InlineKeyboardBuilder, b_id: int, c_id: int, like: b
             callback_data=f"book:show:like:{c_id}:{b_id}",
         )
 
-async def back_btn(builder: InlineKeyboardBuilder, to: str = "main", idx: int | None = None):
+async def next_btn(builder: InlineKeyboardBuilder, to: str, c_id: int, book_id: int) -> None:
+
+    btn = {}
+    btn_text = "➡️"
+
+    if to == "books":
+        btn[f"menu:c:sh:{c_id}:{book_id}"] = btn_text
+
+    for k, v in btn.items():
+        builder.button(
+            text=k,
+            callback_data=k
+        )
+
+async def back_btn(builder: InlineKeyboardBuilder, to: str = "main", c_id: int = None, b_id: int = None):
 
     btn = {}
     btn_txt = "⬅️"
@@ -37,7 +51,11 @@ async def back_btn(builder: InlineKeyboardBuilder, to: str = "main", idx: int | 
         btn["menu:categories"] = btn_txt
 
     elif to == "books":
-        btn[f"menu:category:show:{idx}"] = btn_txt
+        if isinstance(c_id, int):
+            if isinstance(b_id, int):
+                btn[f"menu:c:sh:{c_id}:{b_id}"] = btn_txt
+            else:
+                btn[f"menu:c:sh:{c_id}"] = btn_txt
 
     for call_data, btn_text in btn.items():
         builder.button(
@@ -62,7 +80,12 @@ async def main_menu(admin: bool) -> InlineKeyboardMarkup:
     builder.adjust(2)
     return builder.as_markup()
 
-async def books_keyboard(books: list[dict]) -> InlineKeyboardMarkup:
+async def books_keyboard(
+    books: list[dict],
+    category_id: int,
+    page_count: int,
+    c_page: int = 1
+) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
     for book in books:
@@ -71,33 +94,74 @@ async def books_keyboard(books: list[dict]) -> InlineKeyboardMarkup:
             callback_data=f"book:show:{book['id']}",
         )
 
-    await back_btn(builder, "categories")
+    first_book_id = books[0]["id"]
+    last_book_id = books[-1]["id"]
 
-    builder.adjust(*([2]*len(books)), 1)
+    # Назад
+    if c_page == 1:
+        await back_btn(builder, "categories")
+    else:
+        builder.button(
+            text="⬅️",
+            callback_data=f"menu:c:sh:{category_id}:prev:{first_book_id}"
+        )
+
+    # Текущая страница
+    builder.button(
+        text=f"{c_page} / {page_count}",
+        callback_data="ignore",
+    )
+
+    # Вперед
+    if c_page != page_count:
+        builder.button(
+            text="➡️",
+            callback_data=f"menu:c:sh:{category_id}:next:{last_book_id}"
+        )
+
+    builder.adjust(*([1] * len(books)), 3)
     return builder.as_markup()
 
 
-async def categories_keyboard(categories: list[dict], add: bool = False, to: str = "main") -> InlineKeyboardMarkup:
+async def categories_keyboard(
+    categories: list[dict],
+    page_count: int,
+    c_page: int = 1,
+    to: str = "main",
+) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
-
-    call = "category:show:"
-
-    if add:
-        call = "menu:category:show:"
-
-    if len(categories) > 50:
-        categories = categories[:-1]
 
     for category in categories:
         builder.button(
             text=f"📚 {category['category_name']}",
-            callback_data=f"{call}{category['id']}",
+            callback_data=f"menu:c:sh:{category['id']}",
         )
 
-    await back_btn(builder, to)
+    first_category_id = categories[0]["id"]
+    last_category_id = categories[-1]["id"]
 
-    builder.adjust(*([2]*len(categories)), 1)
+    if c_page == 1:
+        await back_btn(builder, to)
+    else:
+        builder.button(
+            text="⬅️",
+            callback_data=f"menu:categories:prev:{first_category_id}",
+        )
+
+    builder.button(
+        text=f"{c_page} / {page_count}",
+        callback_data="ignore",
+    )
+
+    if c_page != page_count:
+        builder.button(
+            text="➡️",
+            callback_data=f"menu:categories:next:{last_category_id}",
+        )
+
+    builder.adjust(*([1] * len(categories)), 3)
     return builder.as_markup()
+
 
 
 async def authors_keyboard(authors: list[dict]) -> InlineKeyboardMarkup:

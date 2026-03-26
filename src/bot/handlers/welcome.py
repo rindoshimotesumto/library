@@ -8,6 +8,7 @@ from src.bot.keyboards.inline import main_menu
 
 from src.db.database import DataBase
 from src.db.repo.users import UsersRepository, User
+from src.db.repo.stats import StatsRepository
 
 from src.config.conf_logs import logger
 
@@ -53,6 +54,22 @@ async def cmd_admin(message: Message, state: FSMContext, db: DataBase):
 
     else:
         await message.answer(UZ_TEXTS["common:start"], reply_markup=await main_menu(True))
+
+@router.message(Command("stats"))
+async def cmd_stats(message: Message, state: FSMContext, db: DataBase):
+    await state.clear()
+    repo = StatsRepository(db)
+
+    stats = await repo.stats("all")
+    answer = (
+        f"📚 Kitoblar: <code>{stats['b_count']}</code> ta\n"
+        f"🗂 Kategoriyalar: <code>{stats['c_count']}</code> ta\n"
+        f"✍️ Mualliflar: <code>{stats['a_count']}</code> ta\n"
+        f"👥 Foydalanuvchilar: <code>{stats['u_count']}</code> ta"
+    )
+
+    await message.answer(answer)
+
 
 @router.message(Command("backup"))
 async def backup(message: Message, state: FSMContext, db: DataBase):

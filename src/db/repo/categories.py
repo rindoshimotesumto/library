@@ -1,3 +1,4 @@
+import math
 
 class CategoriesRepository:
     def __init__(self, db):
@@ -11,22 +12,51 @@ class CategoriesRepository:
         params = (category_name,)
         await self.db.execute(sql, params)
 
-    async def get_categories(self,  last_id: int | None = None, PAGE_SIZE: int = 50):
-        sql = """
-        SELECT categories.id, categories.category_name
+    async def get_categories(
+            self,
+            cursor_id: int | None = None,
+            page_size: int = 9,
+            direction: str = "next",
+    ):
+        if cursor_id is None:
+            sql = """
+            SELECT categories.id, categories.category_name
             FROM categories
+            ORDER BY categories.id DESC
+            LIMIT ?
+            """
+            return await self.db.fetchall(sql, (page_size,))
+
+        if direction == "next":
+            sql = """
+            SELECT categories.id, categories.category_name
+            FROM categories
+            WHERE categories.id < ?
+            ORDER BY categories.id DESC
+            LIMIT ?
+            """
+            return await self.db.fetchall(sql, (cursor_id, page_size))
+
+        if direction == "prev":
+            sql = """
+            SELECT categories.id, categories.category_name
+            FROM categories
+            WHERE categories.id > ?
+            ORDER BY categories.id ASC
+            LIMIT ?
+            """
+            rows = await self.db.fetchall(sql, (cursor_id, page_size))
+            return list(reversed(rows))
+
+        raise ValueError(f"Unknown direction: {direction}")
+
+    async def get_categories_page_count(self, page_size: int = 9):
+        sql = """
+        SELECT COUNT(*) as count
+        FROM categories
         """
-        params = []
-
-        if last_id:
-            sql += "WHERE categories.id < ?"
-            params.append(last_id)
-
-        sql += "ORDER BY categories.id DESC LIMIT ?"
-        params.append(PAGE_SIZE)
-
-        row = await self.db.fetchall(sql, tuple(params))
-        return row
+        row = await self.db.fetchone(sql)
+        return max(1, math.ceil(row["count"] / page_size))
 
     async def get_category_id(self, min_: bool) -> int:
         sql = """

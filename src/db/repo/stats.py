@@ -148,3 +148,17 @@ class StatsRepository:
 
         setattr(stats, field.value, value)
         return await self.save_data(stats) is not None
+
+    async def stats(self, stat_type: str):
+
+        if stat_type == "all":
+            sql = """
+            SELECT 
+                (SELECT COUNT(*) FROM books) as b_count,
+                (SELECT COUNT(*) FROM categories) as c_count,
+                (SELECT COUNT(*) FROM authors) as a_count,
+                (SELECT COUNT(*) FROM users) as u_count
+            """
+
+        row = await self.db.fetchone(sql)
+        return row if row else {}

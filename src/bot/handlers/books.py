@@ -13,25 +13,26 @@ from src.config.conf_logs import logger
 
 router = Router()
 
-@router.callback_query(F.data == "menu:books")
-async def book_menu(call: CallbackQuery, state: FSMContext, db: DataBase):
-    await call.answer()
-
-    books_repo = BookRepository(db)
-    book_list = await books_repo.get_books()
-
-    if not book_list:
-        await call.message.edit_text(text=UZ_TEXTS["error:not_found"])
-        return
-
-    book_kb = await books_keyboard(book_list)
-
-    try:
-        await call.message.edit_text(text=UZ_TEXTS["admin:btn_my_books"], reply_markup=book_kb)
-
-    except Exception as e:
-        await call.message.answer(text=UZ_TEXTS["admin:btn_my_books"], reply_markup=book_kb)
-        await call.message.delete()
+# @router.callback_query(F.data == "menu:books")
+# async def book_menu(call: CallbackQuery, state: FSMContext, db: DataBase):
+#     await call.answer()
+#
+#     books_repo = BookRepository(db)
+#     book_list = await books_repo.get_books()
+#     books_count =await books_repo.get_books_page_count()
+#
+#     if not book_list:
+#         await call.message.edit_text(text=UZ_TEXTS["error:not_found"])
+#         return
+#
+#     book_kb = await books_keyboard(book_list, books_count)
+#
+#     try:
+#         await call.message.edit_text(text=UZ_TEXTS["admin:btn_my_books"], reply_markup=book_kb)
+#
+#     except Exception as e:
+#         await call.message.answer(text=UZ_TEXTS["admin:btn_my_books"], reply_markup=book_kb)
+#         await call.message.delete()
 
 @router.callback_query(F.data.startswith("book:show"))
 async def show_book(call: CallbackQuery, state: FSMContext, db: DataBase):

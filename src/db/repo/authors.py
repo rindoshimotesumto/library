@@ -11,7 +11,7 @@ class AuthorRepository:
         params = (author_name,)
         await self.db.execute(sql, params)
 
-    async def get_authors(self, last_id: int | None = None, PAGE_SIZE: int = 100) -> list[dict]:
+    async def get_authors(self, last_id: int | None = None, page_size: int = 10) -> list[dict]:
         sql = """
         SELECT * FROM authors
         """
@@ -19,9 +19,9 @@ class AuthorRepository:
 
         if last_id:
             params.append(last_id)
-            sql += f" WHERE authors.id > ?"
+            sql += f" WHERE authors.id < ?"
 
-        params.append(PAGE_SIZE)
+        params.append(page_size)
         sql += f"LIMIT ?"
 
         row = await self.db.fetchall(sql, tuple(params))

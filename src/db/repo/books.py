@@ -1,5 +1,11 @@
+import math
+
 from dataclasses import dataclass
 from typing import Optional
+from zipapp import create_archive
+
+from src.config.conf_logs import logger
+
 
 @dataclass
 class Book:
@@ -65,7 +71,7 @@ class BookRepository:
 
         return None
 
-    async def get_books(self,  last_id: int | None = None, PAGE_SIZE: int = 50):
+    async def get_books(self,  last_id: int | None = None, page_size: int = 10):
         sql = """
         SELECT books.id, books.book_name
             FROM books
@@ -73,34 +79,54 @@ class BookRepository:
         params = []
 
         if last_id:
-            sql += "WHERE books.id > ?"
+            sql += "WHERE books.id < ?"
             params.append(last_id)
 
         sql += "ORDER BY books.id DESC LIMIT ?"
-        params.append(PAGE_SIZE)
+        params.append(page_size)
 
         row = await self.db.fetchall(sql, tuple(params))
         return row
 
-    async def get_books_category(self,  category_id: int, last_id: int | None = None, PAGE_SIZE: int = 50):
-        sql = """
-        SELECT books.id, books.book_name
+    async def get_books_category(
+            self,
+            category_id: int,
+            cursor_id: int | None = None,
+            page_size: int = 10,
+            direction: str = "next",
+    ):
+        if cursor_id is None:
+            sql = """
+            SELECT books.id, books.book_name
             FROM books
-        """
-        params = [category_id]
+            WHERE books.category_id = ?
+            ORDER BY books.id DESC
+            LIMIT ?
+            """
+            return await self.db.fetchall(sql, (category_id, page_size))
 
-        if last_id:
-            sql += "WHERE books.id > ? AND books.category_id = ?"
-            params.append(last_id)
+        if direction == "next":
+            sql = """
+            SELECT books.id, books.book_name
+            FROM books
+            WHERE books.category_id = ? AND books.id < ?
+            ORDER BY books.id DESC
+            LIMIT ?
+            """
+            return await self.db.fetchall(sql, (category_id, cursor_id, page_size))
 
-        sql += """
-        WHERE books.category_id = ?
-        ORDER BY books.id DESC LIMIT ?
-        """
-        params.append(PAGE_SIZE)
+        if direction == "prev":
+            sql = """
+            SELECT books.id, books.book_name
+            FROM books
+            WHERE books.category_id = ? AND books.id > ?
+            ORDER BY books.id ASC
+            LIMIT ?
+            """
+            rows = await self.db.fetchall(sql, (category_id, cursor_id, page_size))
+            return list(reversed(rows))
 
-        row = await self.db.fetchall(sql, tuple(params))
-        return row
+        raise ValueError(f"Unknown direction: {direction}")
 
     async def add_book_file(self, book_id: int, book_file_id: str):
         sql = """
@@ -110,3 +136,16 @@ class BookRepository:
 
         params = (book_id, book_file_id)
         await self.db.execute(sql, params)
+
+    async def get_books_page_count(self, category_id: int = None, page_book_count: int = 9) -> int:
+        sql = """
+        SELECT COUNT(*) AS count FROM books
+        """
+        params = []
+
+        if isinstance(category_id, int):
+            sql += " WHERE books.category_id = ?"
+            params.append(category_id)
+
+        row = await self.db.fetchone(sql, (*params,))
+        return math.ceil(max(row['count'], 1) / page_book_count)

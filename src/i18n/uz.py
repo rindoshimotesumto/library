@@ -8,7 +8,6 @@ UZ_TEXTS: dict[str, str] = {
     "common:welcome_back": "👋 Yana ko‘rishganimizdan xursandmiz, <b>{name}</b>!",
     "common:choose_action": "Kerakli bo‘limni tanlang 👇",
     "common:loading": "⏳ Yuklanmoqda...",
-    "common:pagination": "📄 Sahifa: {current}/{total}",
 
     # --- Majburiy obuna (Обязательная подписка) ---
     "sub:required": "❌ <b>Kechirasiz, botdan foydalanish uchun kanalimizga a'zo bo'lishingiz kerak!</b>",
@@ -29,18 +28,6 @@ UZ_TEXTS: dict[str, str] = {
     # --- Раздел: Книги (book) ---
     "book:list_title": "📚 <b>Kitoblar ro‘yxati:</b>",
     "book:list_empty": "📭 Hozircha bu yerda kitoblar mavjud emas.",
-
-    "book:info": (
-        "📕 <b>Nomi:</b> {title}\n"
-        "✍️ <b>Muallif:</b> {author}\n"
-        "🗂 <b>Kategoriya:</b> {category}\n"
-        "📄 <b>Hajmi:</b> {pages} bet\n"
-        "🌐 <b>Tili:</b> {language}\n"
-        "📅 <b>Nashr yili:</b> {year}\n"
-        "⭐ <b>Reyting:</b> {rating}/5\n\n"
-        "📝 <b>Tavsif:</b>\n<i>{description}</i>"
-        "🔗 <b><a href={link}>Havola</a></b>"
-    ),
 
     # --- Раздел: Категории (category) ---
     "category:list_title": "🗂 <b>Kategoriyalar:</b>\nO‘zingizga yoqqan yo‘nalishni tanlang:",
