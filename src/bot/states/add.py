@@ -14,6 +14,8 @@ class AddBook(StatesGroup):
     book_files_list = State()
 
 class AddCategory(StatesGroup):
+    c_id = State()
+    c_name_upd = State()
     category_name = State()
 
 class AddAuthor(StatesGroup):

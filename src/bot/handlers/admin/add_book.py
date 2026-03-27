@@ -1,6 +1,7 @@
 import asyncio
 import time
 import re
+from idlelib.window import add_windows_to_menu
 
 from aiogram import F, Router
 from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
@@ -17,6 +18,7 @@ from src.db.repo.authors import AuthorRepository
 from src.bot.keyboards.inline import categories_keyboard, authors_keyboard, main_menu
 from src.bot.keyboards.reply import next_state
 from src.config.conf_logs import logger
+from src.bot.handlers.categories import show_categories
 
 router = Router()
 TG_INTERNAL_LINK = r'https?://t\.me/c/\d+/\d+(?:/\d+)?'
@@ -24,19 +26,20 @@ TG_INTERNAL_LINK = r'https?://t\.me/c/\d+/\d+(?:/\d+)?'
 @router.callback_query(F.data == "admin:b:add")
 async def start_add_book(call: CallbackQuery, state: FSMContext, db: DataBase):
     await state.clear()
-    category_repo = CategoriesRepository(db)
-    categories = await category_repo.get_categories()
+    # category_repo = CategoriesRepository(db)
+    # categories = await category_repo.get_categories()
+    #
+    # if len(categories) == 0:
+    #     await state.clear()
+    #     await call.message.edit_text(UZ_TEXTS["admin:prompt_category_name"])
+    #     await state.set_state(AddCategory.category_name)
+    #     return
+    #
+    # await call.message.edit_text(
+    #     UZ_TEXTS["admin:prompt_book_category"],
+    #     reply_markup= await categories_keyboard(categories, to="admin"))
 
-    if len(categories) == 0:
-        await state.clear()
-        await call.message.edit_text(UZ_TEXTS["admin:prompt_category_name"])
-        await state.set_state(AddCategory.category_name)
-        return
-
-    await call.message.edit_text(
-        UZ_TEXTS["admin:prompt_book_category"],
-        reply_markup= await categories_keyboard(categories, to="admin"))
-
+    await show_categories(call, state, db, True)
     await state.set_state(AddBook.category_id)
 
 @router.callback_query(AddBook.category_id)

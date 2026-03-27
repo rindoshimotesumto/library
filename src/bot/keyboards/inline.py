@@ -125,17 +125,32 @@ async def books_keyboard(
 
 async def categories_keyboard(
     categories: list[dict],
-    page_count: int,
+    page_count: int = 1,
     c_page: int = 1,
     to: str = "main",
+    add: bool = False,
+    admin: bool = False,
 ) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
+    if add:
+        call_data = "category:show:"
+
+    else:
+        call_data = "menu:c:sh:"
+
     for category in categories:
-        builder.button(
-            text=f"📚 {category['category_name']}",
-            callback_data=f"menu:c:sh:{category['id']}",
-        )
+        if admin is True or add is True:
+            builder.button(
+                text=f"📚 {category['category_name']} ({category['book_count']}ta)",
+                callback_data=f"{call_data}{category['id']}",
+            )
+
+        else:
+            builder.button(
+                text=f"📚 {category['category_name']}",
+                callback_data=f"{call_data}{category['id']}",
+            )
 
     first_category_id = categories[0]["id"]
     last_category_id = categories[-1]["id"]

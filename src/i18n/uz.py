@@ -71,6 +71,7 @@ UZ_TEXTS: dict[str, str] = {
     "admin:btn_categories": "📁 Kategoriyalar",
     "admin:btn_add_category": "➕ Kategoriya qo‘shish",
     "admin:prompt_category_name": "📝 Yangi kategoriya nomini kiriting:",
+    "admin:prompt_category_name_edit": "📝 Kategoriya yangi nomini kiriting:",
     "admin:msg_category_added": "✅ <b>Kategoriya muvaffaqiyatli qo‘shildi!</b>",
 
     # --- Раздел: Авторы (Authors) ---
@@ -101,6 +102,7 @@ UZ_BTNS: dict[str, dict[str, str]] = {
         "admin:b:add": "➕ Kitob qo‘shish",
         # "admin:b:del": "🗑 Kitob o‘chirish",
         "admin:c:add": "➕ Kategoriya qo‘shish",
+        "admin:c:edit": "📝 Kategoriya o'zgartirish",
         # "admin:c:del": "🗑 Kategoriya o‘chirish",
         "admin:a:add": "➕ Muallif qo‘shish",
         # "admin:a:del": "🗑 Muallif o'chirish",

@@ -8,13 +8,22 @@ from src.bot.keyboards.inline import books_keyboard, categories_keyboard
 
 from src.db.repo.books import BookRepository
 from src.db.repo.categories import CategoriesRepository
+from src.db.repo.users import UsersRepository
 from src.db.database import DataBase
 
 router = Router()
 
 @router.callback_query(F.data.startswith("menu:categories"))
-async def show_categories(callback: CallbackQuery, state: FSMContext, db: DataBase):
+async def show_categories(callback: CallbackQuery, state: FSMContext, db: DataBase, admin: bool = False):
     await callback.answer()
+
+    users_repo = UsersRepository(db)
+    user_is_admin = await users_repo.get_user(callback.from_user.id)
+
+    if user_is_admin.role == "admin":
+        user_is_admin = True
+    else:
+        user_is_admin = False
 
     data = await state.get_data()
     current_page = data.get("categories_current_page", 1)
@@ -35,10 +44,11 @@ async def show_categories(callback: CallbackQuery, state: FSMContext, db: DataBa
         cursor_id=cursor_id,
         page_size=9,
         direction=direction or "next",
+        admin=user_is_admin
     )
 
     if not categories:
-        await callback.answer("Категории не найдены", show_alert=False)
+        await callback.answer("-", show_alert=False)
         return
 
     if direction == "next":
@@ -55,6 +65,8 @@ async def show_categories(callback: CallbackQuery, state: FSMContext, db: DataBa
         page_count=page_count,
         c_page=current_page,
         to="main",
+        add=admin,
+        admin=user_is_admin
     )
 
     try:
@@ -98,7 +110,7 @@ async def show_category_books(callback: CallbackQuery, state: FSMContext, db: Da
     )
 
     if not books:
-        await callback.answer("Книги не найдены", show_alert=False)
+        await callback.answer("-", show_alert=False)
         return
 
     # books = books[:9]

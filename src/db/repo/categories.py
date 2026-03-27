@@ -17,34 +17,82 @@ class CategoriesRepository:
             cursor_id: int | None = None,
             page_size: int = 9,
             direction: str = "next",
+            admin: bool = False,
     ):
         if cursor_id is None:
             sql = """
             SELECT categories.id, categories.category_name
-            FROM categories
-            ORDER BY categories.id DESC
-            LIMIT ?
             """
+
+            if admin:
+                sql += """
+                        , COUNT(books.id) as book_count
+                    FROM categories
+                        JOIN books ON categories.id = books.category_id
+                    GROUP BY categories.id, categories.category_name
+                    ORDER BY categories.id DESC
+                    LIMIT ?
+                """
+
+            else:
+                sql += """
+                    FROM categories
+                    ORDER BY categories.id DESC
+                    LIMIT ?
+                """
+
             return await self.db.fetchall(sql, (page_size,))
 
         if direction == "next":
             sql = """
             SELECT categories.id, categories.category_name
-            FROM categories
-            WHERE categories.id < ?
-            ORDER BY categories.id DESC
-            LIMIT ?
             """
+
+            if admin:
+                sql += """
+                        , COUNT(books.id) as book_count
+                    FROM categories
+                        JOIN books ON categories.id = books.category_id
+                    WHERE categories.id < ?
+                    GROUP BY categories.id, categories.category_name
+                    ORDER BY categories.id DESC
+                    LIMIT ?
+                """
+
+            else:
+                sql += """
+                    FROM categories
+                    WHERE categories.id < ?
+                    ORDER BY categories.id DESC
+                    LIMIT ?
+                """
+
             return await self.db.fetchall(sql, (cursor_id, page_size))
 
         if direction == "prev":
             sql = """
             SELECT categories.id, categories.category_name
-            FROM categories
-            WHERE categories.id > ?
-            ORDER BY categories.id ASC
-            LIMIT ?
             """
+
+            if admin:
+                sql += """
+                    , COUNT(books.id) as book_count
+                    FROM categories
+                        JOIN books ON categories.id = books.category_id
+                    WHERE categories.id > ?
+                    GROUP BY categories.id, categories.category_name
+                    ORDER BY categories.id ASC
+                    LIMIT ?
+                """
+
+            else:
+                sql += """
+                    FROM categories
+                    WHERE categories.id > ?
+                    ORDER BY categories.id ASC
+                    LIMIT ?    
+                """
+
             rows = await self.db.fetchall(sql, (cursor_id, page_size))
             return list(reversed(rows))
 
@@ -71,3 +119,10 @@ class CategoriesRepository:
 
         row = await self.db.fetchone(sql)
         return row["id"]
+
+    async def edit_category(self, name: str, c_id: int):
+        sql = """
+        UPDATE categories SET category_name = ? WHERE id = ?
+        """
+        params = (name, c_id)
+        await self.db.execute(sql, params)
