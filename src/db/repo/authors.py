@@ -11,18 +11,37 @@ class AuthorRepository:
         params = (author_name,)
         await self.db.execute(sql, params)
 
-    async def get_authors(self, last_id: int | None = None, page_size: int = 10) -> list[dict]:
-        sql = """
-        SELECT * FROM authors
-        """
+    async def get_authors(
+            self,
+            cursor_id: int | None = None,
+            page_size: int = 10,
+            direction: str = "next"
+    ) -> list[dict]:
+        sql = "SELECT * FROM authors"
         params = []
 
-        if last_id:
-            params.append(last_id)
-            sql += f" WHERE authors.id < ?"
+        if cursor_id:
+            if direction == "next":
+                sql += " WHERE id < ?"
+            else:
+                sql += " WHERE id > ?"
+            params.append(cursor_id)
 
+        order = "DESC" if direction == "next" else "ASC"
+        sql += f" ORDER BY id {order} LIMIT ?"
         params.append(page_size)
-        sql += f"LIMIT ?"
 
-        row = await self.db.fetchall(sql, tuple(params))
-        return row
+        rows = await self.db.fetchall(sql, tuple(params))
+
+        # если идём назад — переворачиваем
+        if direction == "prev":
+            rows = list(reversed(rows))
+
+        return rows
+
+    async def get_authors_page_count(self, page_size: int) -> int:
+        sql = "SELECT COUNT(*) as count FROM authors"
+        row = await self.db.fetchone(sql)
+
+        total = row["count"]
+        return (total + page_size - 1) // page_size

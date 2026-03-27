@@ -156,6 +156,9 @@ async def categories_keyboard(
     last_category_id = categories[-1]["id"]
 
     if c_page == 1:
+        if add:
+            to = "admin"
+
         await back_btn(builder, to)
     else:
         builder.button(
@@ -179,7 +182,11 @@ async def categories_keyboard(
 
 
 
-async def authors_keyboard(authors: list[dict]) -> InlineKeyboardMarkup:
+async def authors_keyboard(
+    authors: list[dict],
+    page_count: int,
+    c_page: int
+) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
     for author in authors:
@@ -188,7 +195,31 @@ async def authors_keyboard(authors: list[dict]) -> InlineKeyboardMarkup:
             callback_data=f"author:{author['id']}",
         )
 
-    builder.adjust(1)
+    first_id = authors[0]["id"]
+    last_id = authors[-1]["id"]
+
+    # ⬅️
+    if c_page == 1:
+        builder.button(text="⬅️", callback_data="admin:b:add")
+    else:
+        builder.button(
+            text="⬅️",
+            callback_data=f"author:prev:{first_id}"
+        )
+
+    builder.button(
+        text=f"{c_page} / {page_count}",
+        callback_data="ignore"
+    )
+
+    # ➡️
+    if c_page != page_count:
+        builder.button(
+            text="➡️",
+            callback_data=f"author:next:{last_id}"
+        )
+
+    builder.adjust(*([1] * len(authors)), 3)
     return builder.as_markup()
 
 async def get_sub_keyboard(chanells_info: list[ChanellInfo]) -> InlineKeyboardMarkup:

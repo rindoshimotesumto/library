@@ -64,7 +64,6 @@ async def show_categories(callback: CallbackQuery, state: FSMContext, db: DataBa
         categories=categories,
         page_count=page_count,
         c_page=current_page,
-        to="main",
         add=admin,
         admin=user_is_admin
     )

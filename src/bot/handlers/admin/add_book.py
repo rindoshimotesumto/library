@@ -46,27 +46,89 @@ async def book_category(call: CallbackQuery, state: FSMContext, db: DataBase):
     await call.answer()
     await state.update_data(category_id=int(call.data.removeprefix("category:show:")))
 
-    authors_repo = AuthorRepository(db)
-    authors = await authors_repo.get_authors()
-
-    if len(authors) == 0:
-        await state.clear()
-        await call.message.edit_text(UZ_TEXTS["admin:btn_add_author"])
-        await state.set_state(AddAuthor.author_name)
+    if call.data == "ignore":
         return
 
+    elif call.data == "admin:b:add":
+        await start_add_book(call, state, db)
+        return
+
+    authors_repo = AuthorRepository(db)
+    page_count = await authors_repo.get_authors_page_count(page_size=10)
+    authors = await authors_repo.get_authors(page_size=10)
+
+    await state.update_data(authors_page=1)
     await call.message.edit_text(
         UZ_TEXTS["admin:prompt_book_author"],
-        reply_markup=await authors_keyboard(authors))
+        reply_markup=await authors_keyboard(
+            authors,
+            page_count=page_count,
+            c_page=1
+        )
+    )
 
     await state.set_state(AddBook.author_id)
 
-@router.callback_query(AddBook.author_id)
-async def book_author(call: CallbackQuery, state: FSMContext, db: DataBase):
+@router.callback_query(AddBook.author_id, F.data.startswith("author"))
+async def book_author(
+    call: CallbackQuery,
+    state: FSMContext,
+    db: DataBase
+):
     await call.answer()
-    await state.update_data(author_id=int(call.data.removeprefix("author:")))
-    await call.message.edit_text(UZ_TEXTS["admin:prompt_book_cover"])
-    await state.set_state(AddBook.cover_file_id)
+
+    data = await state.get_data()
+    current_page = data.get("authors_page", 1)
+
+    payload = call.data.split(":")
+
+    direction = None
+    cursor_id = None
+
+    # 👉 выбор автора
+    if len(payload) == 2:
+        author_id = int(payload[1])
+
+        await state.update_data(author_id=author_id)
+
+        await call.message.edit_text(UZ_TEXTS["admin:prompt_book_cover"])
+        await state.set_state(AddBook.cover_file_id)
+        return
+
+    # 👉 пагинация
+    elif len(payload) == 3:
+        direction = payload[1]
+        cursor_id = int(payload[2])
+
+    repo = AuthorRepository(db)
+
+    page_count = await repo.get_authors_page_count(page_size=10)
+
+    authors = await repo.get_authors(
+        cursor_id=cursor_id,
+        direction=direction or "next",
+        page_size=10
+    )
+
+    if not authors:
+        await call.answer("-")
+        return
+
+    # страницы
+    if direction == "next":
+        current_page += 1
+    elif direction == "prev":
+        current_page = max(1, current_page - 1)
+
+    await state.update_data(authors_page=current_page)
+
+    kb = await authors_keyboard(
+        authors=authors,
+        page_count=page_count,
+        c_page=current_page
+    )
+
+    await call.message.edit_reply_markup(reply_markup=kb)
 
 @router.message(AddBook.cover_file_id, F.photo)
 async def book_cover_file_id(message: Message, state: FSMContext, db: DataBase):
