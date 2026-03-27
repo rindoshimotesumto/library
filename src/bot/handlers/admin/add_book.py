@@ -1,7 +1,6 @@
 import asyncio
 import time
 import re
-from idlelib.window import add_windows_to_menu
 
 from aiogram import F, Router
 from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
