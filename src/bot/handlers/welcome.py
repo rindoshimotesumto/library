@@ -7,6 +7,7 @@ from src.i18n.uz import UZ_TEXTS
 from src.bot.keyboards.inline import main_menu
 
 from src.db.database import DataBase
+from src.db.repo.books import BookRepository
 from src.db.repo.users import UsersRepository, User
 from src.db.repo.stats import StatsRepository
 
@@ -70,6 +71,12 @@ async def cmd_stats(message: Message, state: FSMContext, db: DataBase):
 
     await message.answer(answer)
 
+@router.message(Command("change"))
+async def cmd_stats(message: Message, state: FSMContext, db: DataBase):
+    await state.clear()
+    repo = BookRepository(db)
+
+    await repo.change_link()
 
 @router.message(Command("backup"))
 async def backup(message: Message, state: FSMContext, db: DataBase):

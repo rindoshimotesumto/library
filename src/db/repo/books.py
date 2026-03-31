@@ -3,6 +3,7 @@ import math
 from dataclasses import dataclass
 from typing import Optional
 from zipapp import create_archive
+from src.db.database import DataBase
 
 from src.config.conf_logs import logger
 
@@ -23,7 +24,7 @@ class Book:
 
 
 class BookRepository:
-    def __init__(self, db):
+    def __init__(self, db: DataBase):
         self.db = db
 
     async def add_book(self, book: Book) -> int:
@@ -149,3 +150,24 @@ class BookRepository:
 
         row = await self.db.fetchone(sql, (*params,))
         return math.ceil(max(row['count'], 1) / page_book_count)
+    
+    async def change_link(self, channel_username: str = "Railway_kutubxona") -> None:
+        rows = await self.db.fetchall("SELECT id, book_file_link FROM books")
+
+        for row in rows:
+            book_id = row["id"]
+            old_link = row["book_file_link"]
+
+            new_link = old_link.replace(
+                old_link.split("/")[-3],
+                channel_username
+            ).removeprefix("https://t.me/c/")
+            
+            new_link = "https://t.me/" + new_link
+
+            await self.db.execute(
+                "UPDATE books SET book_file_link = ? WHERE id = ?",
+                (new_link, book_id)
+            )
+
+        return None

@@ -20,7 +20,7 @@ from src.config.conf_logs import logger
 from src.bot.handlers.categories import show_categories
 
 router = Router()
-TG_INTERNAL_LINK = r'https?://t\.me/c/\d+/\d+(?:/\d+)?'
+TG_INTERNAL_LINK = r'https?://t\.me/(?:c/\d+|[A-Za-z0-9_]+)/\d+(?:/\d+)?'
 
 @router.callback_query(F.data == "admin:b:add")
 async def start_add_book(call: CallbackQuery, state: FSMContext, db: DataBase):
