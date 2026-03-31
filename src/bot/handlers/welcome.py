@@ -76,6 +76,9 @@ async def cmd_stats(message: Message, state: FSMContext, db: DataBase):
     await state.clear()
     repo = BookRepository(db)
 
+    if message.from_user.id not in admin:
+        return
+
     await repo.change_link()
 
 @router.message(Command("backup"))
