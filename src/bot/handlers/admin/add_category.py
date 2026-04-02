@@ -35,8 +35,9 @@ async def prompt_category_name(message: Message, state: FSMContext, db: DataBase
     finally:
         await state.clear()
 
+
 @router.callback_query(F.data == "admin:c:edit")
-async def add_category(call: CallbackQuery, state: FSMContext, db: DataBase):
+async def edit_category(call: CallbackQuery, state: FSMContext, db: DataBase):
     await state.clear()
 
     await show_categories(call, state, db, True)
@@ -44,7 +45,7 @@ async def add_category(call: CallbackQuery, state: FSMContext, db: DataBase):
 
 
 @router.callback_query(AddCategory.c_id, F.data.startswith("category:show:"))
-async def add_category(call: CallbackQuery, state: FSMContext, db: DataBase):
+async def prompt_category_edit_name(call: CallbackQuery, state: FSMContext, db: DataBase):
 
     category_id = int(call.data.split(":")[-1])
     await state.update_data(c_id = category_id)
@@ -53,7 +54,7 @@ async def add_category(call: CallbackQuery, state: FSMContext, db: DataBase):
 
 
 @router.message(AddCategory.c_name_upd)
-async def add_category(message: Message, state: FSMContext, db: DataBase):
+async def update_category(message: Message, state: FSMContext, db: DataBase):
     categories_repo = CategoriesRepository(db)
     data = await state.get_data()
 

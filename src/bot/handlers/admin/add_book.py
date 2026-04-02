@@ -41,17 +41,21 @@ async def start_add_book(call: CallbackQuery, state: FSMContext, db: DataBase):
     await show_categories(call, state, db, True)
     await state.set_state(AddBook.category_id)
 
-@router.callback_query(AddBook.category_id)
+@router.callback_query(
+    AddBook.category_id,
+    F.data.in_({"ignore", "admin:b:add"}) | F.data.startswith("category:show:")
+)
 async def book_category(call: CallbackQuery, state: FSMContext, db: DataBase):
     await call.answer()
-    await state.update_data(category_id=int(call.data.removeprefix("category:show:")))
 
     if call.data == "ignore":
         return
-
     elif call.data == "admin:b:add":
         await start_add_book(call, state, db)
         return
+
+    category_id = int(call.data.removeprefix("category:show:"))
+    await state.update_data(category_id=category_id)
 
     authors_repo = AuthorRepository(db)
     page_count = await authors_repo.get_authors_page_count(page_size=10)

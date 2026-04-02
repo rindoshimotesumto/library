@@ -10,8 +10,10 @@ from src.db.repo.books import BookRepository
 from src.db.repo.categories import CategoriesRepository
 from src.db.repo.users import UsersRepository
 from src.db.database import DataBase
+from src.bot.states.add import AddBook
 
 router = Router()
+
 
 @router.callback_query(F.data.startswith("menu:categories"))
 async def show_categories(callback: CallbackQuery, state: FSMContext, db: DataBase, admin: bool = False):
@@ -20,10 +22,7 @@ async def show_categories(callback: CallbackQuery, state: FSMContext, db: DataBa
     users_repo = UsersRepository(db)
     user_is_admin = await users_repo.get_user(callback.from_user.id)
 
-    if user_is_admin.role == "admin":
-        user_is_admin = True
-    else:
-        user_is_admin = False
+    user_is_admin = user_is_admin.role == "admin"
 
     data = await state.get_data()
     current_page = data.get("categories_current_page", 1)
@@ -60,11 +59,14 @@ async def show_categories(callback: CallbackQuery, state: FSMContext, db: DataBa
 
     await state.update_data(categories_current_page=current_page)
 
+    current_state = await state.get_state()
+    is_add_mode = (current_state == AddBook.category_id.state) or admin
+
     categories_kb = await categories_keyboard(
         categories=categories,
         page_count=page_count,
         c_page=current_page,
-        add=admin,
+        add=is_add_mode,
         admin=user_is_admin
     )
 
@@ -80,6 +82,9 @@ async def show_categories(callback: CallbackQuery, state: FSMContext, db: DataBa
             reply_markup=categories_kb,
         )
         await callback.message.delete()
+
+
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 
 @router.callback_query(F.data.startswith("menu:c:sh:"))
@@ -109,10 +114,20 @@ async def show_category_books(callback: CallbackQuery, state: FSMContext, db: Da
     )
 
     if not books:
-        await callback.answer("-", show_alert=False)
-        return
+        if cursor_id is None:
+            back_kb = InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text="⬅️ Ortga", callback_data="menu:categories")]
+            ])
 
-    # books = books[:9]
+            empty_text = "Bu kategoriyada hozircha kitoblar yo'q."
+
+            await callback.message.edit_text(
+                empty_text,
+                reply_markup=back_kb
+            )
+        else:
+            await callback.answer("-", show_alert=False)
+        return
 
     if direction == "next":
         current_page += 1
