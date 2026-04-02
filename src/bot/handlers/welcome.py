@@ -1,6 +1,6 @@
 from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery, FSInputFile
-from aiogram.filters.command import CommandStart, Command
+from aiogram.filters.command import CommandStart, Command, CommandObject
 from aiogram.fsm.context import FSMContext
 
 from src.i18n.uz import UZ_TEXTS
@@ -10,6 +10,7 @@ from src.db.database import DataBase
 from src.db.repo.books import BookRepository
 from src.db.repo.users import UsersRepository, User
 from src.db.repo.stats import StatsRepository
+from src.db.repo.categories import CategoriesRepository
 
 from src.config.conf_logs import logger
 
@@ -105,6 +106,40 @@ async def backup(message: Message, state: FSMContext, db: DataBase):
     except Exception as e:
         await message.answer(f"Backup ⚠️: {str(e)}")
         return
+
+
+@router.message(Command("rmc"))
+async def remove_category(message: Message, command: CommandObject, db: DataBase):
+    # 1. Проверяем, является ли пользователь админом
+    users_repo = UsersRepository(db)
+    user = await users_repo.get_user(message.from_user.id)
+
+    if not user or user.role != "admin":
+        # Если не админ, просто игнорируем команду (или можно отправить сообщение об отказе)
+        return
+
+    # 2. Проверяем, передал ли админ аргумент (ID категории)
+    if not command.args:
+        await message.answer("⚠️ Вы не указали ID категории.\nИспользование: `/rmc [id]`\nПример: `/rmc 5`",
+                             parse_mode="Markdown")
+        return
+
+    # 3. Проверяем, является ли аргумент числом
+    if not command.args.isdigit():
+        await message.answer("⚠️ ID категории должен быть числом.")
+        return
+
+    category_id = int(command.args)
+    categories_repo = CategoriesRepository(db)
+
+    # 4. Удаляем категорию
+    deleted = await categories_repo.delete_category(category_id)
+
+    if deleted:
+        await message.answer(f"✅ Категория с ID {category_id} была успешно удалена.")
+    else:
+        await message.answer(f"❌ Категория с ID {category_id} не найдена.")
+
 
 # @router.message(F.photo)
 # async def cmd_photo(message: Message, db: DataBase):

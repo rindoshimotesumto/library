@@ -1,7 +1,10 @@
 import math
 
+from src.db.database import DataBase
+
+
 class CategoriesRepository:
-    def __init__(self, db):
+    def __init__(self, db: DataBase):
         self.db = db
 
     async def add_category(self, category_name: str):
@@ -28,7 +31,7 @@ class CategoriesRepository:
                 sql += """
                         , COUNT(books.id) as book_count
                     FROM categories
-                        JOIN books ON categories.id = books.category_id
+                        LEFT JOIN books ON categories.id = books.category_id
                     GROUP BY categories.id, categories.category_name
                     ORDER BY categories.id DESC
                     LIMIT ?
@@ -52,7 +55,7 @@ class CategoriesRepository:
                 sql += """
                         , COUNT(books.id) as book_count
                     FROM categories
-                        JOIN books ON categories.id = books.category_id
+                        LEFT JOIN books ON categories.id = books.category_id
                     WHERE categories.id < ?
                     GROUP BY categories.id, categories.category_name
                     ORDER BY categories.id DESC
@@ -78,7 +81,7 @@ class CategoriesRepository:
                 sql += """
                     , COUNT(books.id) as book_count
                     FROM categories
-                        JOIN books ON categories.id = books.category_id
+                        LEFT JOIN books ON categories.id = books.category_id
                     WHERE categories.id > ?
                     GROUP BY categories.id, categories.category_name
                     ORDER BY categories.id ASC
@@ -126,3 +129,9 @@ class CategoriesRepository:
         """
         params = (name, c_id)
         await self.db.execute(sql, params)
+
+    async def delete_category(self, category_id: int) -> bool:
+        sql = "DELETE FROM categories WHERE id = ?"
+
+        await self.db.execute(sql, (category_id,))
+        return True
