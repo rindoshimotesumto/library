@@ -45,3 +45,9 @@ class AuthorRepository:
 
         total = row["count"]
         return (total + page_size - 1) // page_size
+
+
+    async def delete_author(self, author_id: int) -> bool:
+        sql = "DELETE FROM authors WHERE id = ?"
+        result = await self.db.execute(sql, (author_id,))
+        return True
