@@ -10,6 +10,7 @@ from src.db.database import DataBase
 from src.db.repo.books import BookRepository
 from src.db.repo.users import UsersRepository, User
 from src.db.repo.stats import StatsRepository
+from src.db.repo.authors import AuthorRepository
 from src.db.repo.categories import CategoriesRepository
 
 from src.config.conf_logs import logger
@@ -141,6 +142,37 @@ async def remove_category(message: Message, command: CommandObject, db: DataBase
         await message.answer(f"❌ Категория с ID {category_id} не найдена.")
 
 
+@router.message(Command("rma"))
+async def remove_author(message: Message, command: CommandObject, db: DataBase):
+    users_repo = UsersRepository(db)
+    user = await users_repo.get_user(message.from_user.id)
+
+    if not user or user.role != "admin":
+        return
+
+    if not command.args:
+        await message.answer(
+            "⚠️ Вы не указали ID автора.\nИспользование: `/rma [id]`\nПример: `/rma 7`",
+            parse_mode="Markdown"
+        )
+        return
+
+    if not command.args.isdigit():
+        await message.answer("⚠️ ID автора должен быть числом.")
+        return
+
+    author_id = int(command.args)
+    author_repo = AuthorRepository(db)
+
+    try:
+        await author_repo.delete_author(author_id)
+        
+        await message.answer(f"✅ Автор с ID {author_id} успешно удален (если он существовал).")
+    except Exception as e:
+        logger.error(f"Error deleting author: {e}")
+        await message.answer(f"❌ Произошла ошибка при удалении автора.")
+
+        
 # @router.message(F.photo)
 # async def cmd_photo(message: Message, db: DataBase):
 #     await message.answer(message.photo[-1].file_id)
