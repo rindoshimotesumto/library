@@ -7,7 +7,7 @@ class Langs(Enum):
     en = "en"
 
 langs_ = [lang.value for lang in Langs]
-DEFAULT_LANG = Langs.uz.value
+DEFAULT_LANG = Langs.uz
 
 I18N = {
     "start": {
@@ -65,20 +65,48 @@ I18N = {
         "ru": "⚙️ Настройки",
         "en": "⚙️ Settings",
     },
-    "no_books": {
+    "no:books": {
         "uz": "📭 Bu kategoriyada kitoblar yo‘q",
         "ru": "📭 В этой категории нет книг",
         "en": "📭 No books in this category",
+    },
+    "not:subscribe": {
+        "uz": (
+            "❌ Botdan foydalanish uchun kanalga obuna bo‘lishingiz kerak.\n\n"
+            "📢 Iltimos, quyidagi kanalga obuna bo‘ling va \"Tekshirish\" tugmasini bosing."
+        ),
+        "ru": (
+            "❌ Для использования бота необходимо подписаться на канал.\n\n"
+            "📢 Пожалуйста, подпишитесь на канал ниже и нажмите кнопку «Проверить»."
+        ),
+        "en": (
+            "❌ To use this bot, you need to subscribe to the channel.\n\n"
+            "📢 Please subscribe to the channel below and press the \"Check\" button."
+        )
+    },
+    "not:subscribe:show_alert": {
+        "uz": "Obunasiz davom etish mumkin emas.",
+        "ru": "Невозможно продолжить — вы не подписаны.",
+        "en": "Cannot continue — you are not subscribed."
+    },
+    "check:subscribe": {
+        "uz": "✅ Tekshirish",
+        "ru": "✅ Проверить",
+        "en": "✅ Check",
     }
 }
 
 MAIN_MSG_BTNS = ["categories", "audio_books", "search:book"]
+CHECK_SUBSCRIBE_BTN = "check:subscribe"
+CATEGORY_BTNS = {
+    "category:view": ""
+}
 
 def t(key: str, lang: str | Langs = None, **kwargs) -> str:
     if isinstance(lang, Langs):
         lang_code = lang.value
     else:
-        lang_code = (lang or DEFAULT_LANG).lower()
+        lang_code = (lang or DEFAULT_LANG.value).lower()
 
     translations = I18N.get(key)
     if not translations:
@@ -87,7 +115,7 @@ def t(key: str, lang: str | Langs = None, **kwargs) -> str:
     text = translations.get(lang_code)
 
     if not text:
-        text = translations.get(DEFAULT_LANG) or next(iter(translations.values()), key)
+        text = translations.get(DEFAULT_LANG.value) or next(iter(translations.values()), key)
 
     try:
         return text.format(**kwargs)

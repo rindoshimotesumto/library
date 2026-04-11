@@ -1,4 +1,5 @@
 import asyncio
+from email import message
 from os import getenv
 
 from redis.asyncio import Redis
@@ -14,10 +15,9 @@ from aiogram.client.default import DefaultBotProperties
 from src.data.database import Database
 from src.data.migrations.runner import run_migrations
 
-from src.bot.middlewares.middlewares import DbMiddleware
-from src.bot.handlers import commands
-
-from src.bot.services.cache_service import UserCacheService
+from src.bot.middlewares.middlewares import DbMiddleware, CheckSubscriberMiddleware
+from src.bot.services.subscribe_service import SubscribeService
+from src.bot.handlers import commands, subscribe
 
 load_dotenv()
 TOKEN = getenv("BOT_TOKEN")
@@ -37,18 +37,21 @@ async def main() -> None:
 
     dp.include_routers(
         commands.router,
+        subscribe.router,
     )
 
+    await db.create_db()
     await db.connect()
     await run_migrations(db)
-
-    dp.message.middleware(DbMiddleware(db))
-    dp.callback_query.middleware(DbMiddleware(db))
 
     bot = Bot(
         token=TOKEN,
         default=DefaultBotProperties(parse_mode=ParseMode.HTML),
     )
+
+    sub_service = SubscribeService(bot, db)
+    dp.update.outer_middleware(DbMiddleware(db, redis_client))
+    dp.callback_query.outer_middleware(CheckSubscriberMiddleware(sub_service))
 
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot, redis=redis_client)

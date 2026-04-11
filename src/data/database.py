@@ -9,17 +9,37 @@ load_dotenv()
 class Database:
     def __init__(self):
         self.pool: asyncpg.Pool | None = None
+        self.user = getenv("DB_USER", "")
+        self.password = getenv("DB_PASSWORD", "")
+        self.host = getenv("DB_HOST", "")
+        self.db_name = getenv("DB_NAME", "")
+        self.port = int(getenv("DB_PORT", "5432"))
+        self.min_size = 1
+        self.max_size = 5
+
+    async def create_db(self):
+        sys_conn = await asyncpg.connect(
+            user=self.user, password=self.password, host=self.host, port=self.port, database='postgres'
+        )
+
+        exists = await sys_conn.fetchval(
+            "SELECT 1 FROM pg_database WHERE datname = $1", self.db_name
+        )
+
+        if not exists:
+            await sys_conn.execute(f'CREATE DATABASE "{self.db_name}"')
+
+        await sys_conn.close()
 
     async def connect(self):
-        # noinspection PyTypeChecker
         self.pool = await asyncpg.create_pool(
-            user=getenv("DB_USER", ""),
-            password=getenv("DB_PASSWORD", ""),
-            host=getenv("DB_HOST", ""),
-            database=getenv("DB_NAME", ""),
-            port=int(getenv("DB_PORT", "5432")),
-            min_size=1,
-            max_size=5
+            user=self.user,
+            password=self.password,
+            host=self.host,
+            database=self.db_name,
+            port=self.port,
+            min_size=self.min_size,
+            max_size=self.max_size,
         )
 
     async def close(self):

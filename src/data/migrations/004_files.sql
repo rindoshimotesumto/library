@@ -8,11 +8,11 @@ CREATE TABLE IF NOT EXISTS files (
     file_type VARCHAR(10) DEFAULT 'document'
         CHECK (file_type IN ('document', 'audio', 'cover')),     -- Тип документы, на всякий случай
 
-    telegram_file_id VARCHAR(255) NOT NULL,                 -- ID к файлу от телеграмм
-    metadata JSONB DEFAULT '{}'::jsonb,                     -- Данные файла (размер, длительность)
+    telegram_file_id VARCHAR(255) NOT NULL,                     -- ID к файлу от телеграмм
+    metadata JSONB DEFAULT '{}'::jsonb,                         -- Данные файла (размер, длительность)
 
     -- Системные поля
-    created_at TIMESTAMP DEFAULT NOW(),                     -- Время добавления в базу
+    created_at TIMESTAMPTZ DEFAULT NOW(),                       -- Время добавления в базу
 
     -- Внешние ключи (Foreign Keys)
     CONSTRAINT fk_files_book_id FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE

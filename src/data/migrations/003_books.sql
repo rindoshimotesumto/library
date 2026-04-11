@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS books (
 
     -- Системные поля
     is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT NOW(),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
 
     -- Внешние ключи
     CONSTRAINT fk_next_part FOREIGN KEY (next_part_id) REFERENCES books(id) ON DELETE SET NULL,

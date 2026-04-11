@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS users_stats (
     watched INTEGER DEFAULT 0,
 
     -- Системные поля
-    created_at TIMESTAMP DEFAULT NOW(),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
 
     CONSTRAINT fk_user_stats_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     CONSTRAINT fk_user_stats_book_id FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE,

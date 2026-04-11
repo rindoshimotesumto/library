@@ -1,11 +1,18 @@
+from typing import Optional
+
+from pydantic import BaseModel
 from redis.asyncio import Redis
 from src.i18n.i18n import Langs, DEFAULT_LANG
 
+class DefaultUserData(BaseModel):
+    tg_id: Optional[int] = None
+    lang: str = DEFAULT_LANG.value
+    role: str = 'user'
 
 class UserCacheService:
     def __init__(self, redis: Redis):
         self.redis = redis
-        self.default_data = {'lang': DEFAULT_LANG, 'role': 'user'}
+        self.default_data = DefaultUserData
 
     async def get_user(self, user_id: int) -> dict:
         key = f"user:{user_id}"
