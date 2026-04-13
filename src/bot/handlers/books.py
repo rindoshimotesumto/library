@@ -8,6 +8,7 @@ from src.db.repo.books import BookRepository
 from src.db.database import DataBase
 from src.db.repo.stats import StatsRepository, Stats, StatsField
 from src.db.repo.users import UsersRepository, User
+from src.bot.states.edit import EditBookName
 
 from src.config.conf_logs import logger
 
@@ -102,3 +103,35 @@ async def show_book(call: CallbackQuery, state: FSMContext, db: DataBase):
 
     except Exception as e:
         await call.message.edit_text(text=caption, reply_markup=kb.as_markup())
+
+
+@router.callback_query(F.data == "admin:b:edit")
+async def edit_book_name(call: CallbackQuery, state: FSMContext, db: DataBase):
+    await call.answer()
+    await call.message.edit_text("Kitob yangi nomini kiriting...")
+    await state.set_state(EditBookName.book_name)
+
+
+@router.message(EditBookName.book_name)
+async def edit_book_name_2(message: Message, state: FSMContext, db: DataBase):
+    await state.update_data(book_name=message.text)
+    await message.answer(f"Kitob ID -sini kiriting...")
+
+    await state.set_state(EditBookName.book_id)
+
+
+@router.message(EditBookName.book_id)
+async def edit_book_name_3(message: Message, state: FSMContext, db: DataBase):
+    if message.text.isdigit() and isinstance(message, Message):
+        data = await state.get_data()
+        x = await BookRepository(db).update_book_name(int(message.text), data.get("book_name", " "))
+
+        if x:
+            await message.answer("✅ O'zgartirildi")
+            return
+
+        await message.answer(f"❌ Xatolik chiqdi")
+        return
+
+    await message.answer(f"Kitob ID -sini kiriting...")
+    return

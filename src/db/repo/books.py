@@ -1,6 +1,7 @@
 import math
 
 from dataclasses import dataclass
+from sqlite3 import IntegrityError
 from typing import Optional
 from zipapp import create_archive
 from src.db.database import DataBase
@@ -171,3 +172,16 @@ class BookRepository:
             )
 
         return None
+
+    async def update_book_name(self, book_id: int, book_name: str) -> bool:
+        sql = """
+        UPDATE books SET book_name = ? WHERE id = ?
+        """
+
+        try:
+            await self.db.execute(sql, (book_name, book_id))
+            return True
+
+        except Exception as e:
+            logger.error(e)
+            return False

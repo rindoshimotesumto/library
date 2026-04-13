@@ -100,6 +100,7 @@ UZ_BTNS: dict[str, dict[str, str]] = {
 
     "menu:admin": {
         "admin:b:add": "➕ Kitob qo‘shish",
+        "admin:b:edit": "📝 Kitob nomini o'zgartirish",
         # "admin:b:del": "🗑 Kitob o‘chirish",
         "admin:c:add": "➕ Kategoriya qo‘shish",
         "admin:c:edit": "📝 Kategoriya o'zgartirish",
