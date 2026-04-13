@@ -84,15 +84,22 @@ async def books_keyboard(
     books: list[dict],
     category_id: int,
     page_count: int,
-    c_page: int = 1
+    c_page: int = 1,
+    show_book_id: bool = False
 ) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
     for book in books:
-        builder.button(
-            text=f"📖 {book['book_name']}",
-            callback_data=f"book:show:{book['id']}",
-        )
+        if show_book_id:
+            builder.button(
+                text=f"📖 {book['book_name']} [{book['id']}]",
+                callback_data=f"book:show:{book['id']}",
+            )
+        else:
+            builder.button(
+                text=f"📖 {book['book_name']}",
+                callback_data=f"book:show:{book['id']}",
+            )
 
     first_book_id = books[0]["id"]
     last_book_id = books[-1]["id"]
@@ -139,16 +146,22 @@ async def categories_keyboard(
     else:
         call_data = "menu:c:sh:"
 
+    _ = {
+        1: '🌍', 2: '⭐', 3: '🕵️', 4: '🌸', 5: '👤', 6: '🏛️',
+        7: '🚀', 8: '📖', 9: '🏛️', 10: '🔬', 11: '😏', 12: '🧭',
+        13: '🧸', 15: '🌱', 16: '🧠', 17: '💼', 19: '🎧'
+    }
+
     for category in categories:
         if admin is True or add is True:
             builder.button(
-                text=f"📚 {category['category_name']} ({category['book_count']}ta)",
+                text=f"{_.get(category['id'], "📚")} {category['category_name']} ({category['book_count']}ta)",
                 callback_data=f"{call_data}{category['id']}",
             )
 
         else:
             builder.button(
-                text=f"📚 {category['category_name']}",
+                text=f"{_.get(category['id'], "📚")} {category['category_name']}",
                 callback_data=f"{call_data}{category['id']}",
             )
 

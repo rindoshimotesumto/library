@@ -130,7 +130,7 @@ async def remove_category(message: Message, command: CommandObject, db: DataBase
         await message.answer("⚠️ ID категории должен быть числом.")
         return
 
-    category_id = int(command.args)
+    category_id = int(command.args.replace(" ", ""))
     categories_repo = CategoriesRepository(db)
 
     # 4. Удаляем категорию
