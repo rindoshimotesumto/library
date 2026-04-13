@@ -138,11 +138,19 @@ async def show_category_books(callback: CallbackQuery, state: FSMContext, db: Da
 
     await state.update_data(current_page=current_page)
 
+    users_repo = UsersRepository(db)
+    user_is_admin = await users_repo.get_user(callback.from_user.id)
+    is_adm = False
+
+    if user_is_admin.role == "admin":
+        is_adm = True
+
     books_kb = await books_keyboard(
         books=books,
         category_id=category_id,
         page_count=books_count,
         c_page=current_page,
+        show_book_id=is_adm,
     )
 
     try:
