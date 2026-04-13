@@ -2,12 +2,14 @@ from typing import Optional
 
 from pydantic import BaseModel
 from redis.asyncio import Redis
+
+from src.data.repo.user import UserRoleType
 from src.i18n.i18n import Langs, DEFAULT_LANG
 
 class DefaultUserData(BaseModel):
     tg_id: Optional[int] = None
-    lang: str = DEFAULT_LANG.value
-    role: str = 'user'
+    lang: Langs = DEFAULT_LANG.value
+    role: UserRoleType = UserRoleType.user.value
 
 class UserCacheService:
     def __init__(self, redis: Redis):

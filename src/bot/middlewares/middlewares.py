@@ -12,7 +12,7 @@ from src.bot.services.cache_service import UserCacheService, DefaultUserData
 from src.data.database import Database
 from src.i18n.i18n import t, DEFAULT_LANG, Langs
 from src.bot.keyboards.inline import check_sub_kb
-from src.data.repo.user import UserRepo, UserDataType
+from src.data.repo.user import UserRepo, UserDataType, UserRoleType
 
 
 class DbMiddleware(BaseMiddleware):
@@ -32,13 +32,15 @@ class DbMiddleware(BaseMiddleware):
 
         if not user_data:
             db_user = await repo.add_user(
-                UserDataType(tg_id=user.id, lang=DEFAULT_LANG.value, role='user')
+                UserDataType(
+                    tg_id=user.id
+                )
             )
 
             user_data = {
                 'tg_id': user.id,
                 'lang': db_user.lang if db_user else DEFAULT_LANG.value,
-                'role': 'user'
+                'role': UserRoleType.user.value
             }
 
             await cache.update_user(user.id, **user_data)

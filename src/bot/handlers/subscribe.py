@@ -10,7 +10,4 @@ router = Router()
 @router.callback_query(F.data == "check:subscribe")
 async def check_sub(call: CallbackQuery, user: DefaultUserData):
     await call.answer()
-    answer = t('start', user.lang)
-    kb = await menu_kb(user.lang)
-
     await call.message.delete()

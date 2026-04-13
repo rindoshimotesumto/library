@@ -55,7 +55,7 @@ async def category_kb(
     for cat in categories:
         builder.button(
             text=cat.name,
-            callback_data=cat.id,
+            callback_data="category:cat.id",
         )
 
     builder.adjust(1)

@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import Optional
 from pydantic import BaseModel, validate_call
 from datetime import datetime
@@ -7,12 +8,20 @@ from src.config.logs_conf import logger
 
 from src.i18n.i18n import Langs
 
+
+class UserRoleType(str, Enum):
+    user = 'user'
+    admin = 'admin'
+    super = 'super'
+
+
 class UserDataType(BaseModel):
     id: Optional[int] = None
     tg_id: int
-    lang: str = Langs.uz.value
-    role: str = 'user'
+    lang: Langs = Langs.uz
+    role: UserRoleType = UserRoleType.user
     created_at: Optional[datetime] = None
+
 
 class UserRepo:
     def __init__(self, db: Database):
@@ -57,7 +66,7 @@ class UserRepo:
         """
 
         try:
-            result = await self.db.fetch_one(sql, data.tg_id, data.lang, data.role)
+            result = await self.db.fetch_one(sql, data.tg_id, data.lang.value, data.role.value)
 
             if result is None:
                 return None

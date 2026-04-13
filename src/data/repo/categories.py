@@ -2,6 +2,7 @@ from enum import Enum
 from typing import Optional
 
 import asyncpg
+from datetime import datetime
 from pydantic import BaseModel, validate_call
 
 from src.data.database import Database

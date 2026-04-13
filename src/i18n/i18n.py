@@ -1,7 +1,7 @@
 from enum import Enum
 from src.config.logs_conf import logger
 
-class Langs(Enum):
+class Langs(str, Enum):
     uz = "uz"
     ru = "ru"
     en = "en"
@@ -51,14 +51,24 @@ I18N = {
         "en": "📚 Audio books",
     },
     "search:book": {
-        "uz": "🔎 Kitob nomini kiriting",
-        "ru": "🔎 Введите название книги",
-        "en": "🔎 Enter book title",
+        "uz": "🔎 Kitob qidirish",
+        "ru": "🔎 Поиск книги",
+        "en": "🔎 Search for a book"
+    },
+    "search:author": {
+        "uz": "👤 Muallif qidirish",
+        "ru": "👤 Поиск автора",
+        "en": "👤 Search for an author"
     },
     "profile": {
         "uz": "👤 Profil ma’lumotlari",
         "ru": "👤 Информация профиля",
         "en": "👤 Profile information",
+    },
+    "random:books": {
+        "uz": "🎲 Tasodifiy kitoblar",
+        "ru": "🎲 Случайные книги",
+        "en": "🎲 Random books"
     },
     "settings": {
         "uz": "⚙️ Sozlamalar",
@@ -93,14 +103,21 @@ I18N = {
         "uz": "✅ Tekshirish",
         "ru": "✅ Проверить",
         "en": "✅ Check",
+    },
+    "favorite:books": {
+        "uz": "❤️‍🔥 Sevimli",
+        "ru": "❤️‍🔥 Избранные",
+        "en": "❤️‍🔥 Favorites"
+    },
+    "choose:category": {
+        "uz": "🗂 Kitob kategoriyasini tanlang",
+        "ru": "🗂 Выберите категорию книги",
+        "en": "🗂 Choose a book category"
     }
 }
 
-MAIN_MSG_BTNS = ["categories", "audio_books", "search:book"]
+MAIN_MSG_BTNS = ["search:book", "search:author", "random:books", "favorite:books"]
 CHECK_SUBSCRIBE_BTN = "check:subscribe"
-CATEGORY_BTNS = {
-    "category:view": ""
-}
 
 def t(key: str, lang: str | Langs = None, **kwargs) -> str:
     if isinstance(lang, Langs):
