@@ -113,6 +113,131 @@ I18N = {
         "uz": "🗂 Kitob kategoriyasini tanlang",
         "ru": "🗂 Выберите категорию книги",
         "en": "🗂 Choose a book category"
+    },
+    "choose:collection": {
+        "uz": "🗂 Kitoblar to‘plamini tanlang",
+        "ru": "🗂 Выберите коллекцию книг",
+        "en": "🗂 Choose a book collection"
+    },
+    "add:cover": {
+        "uz": "📷 Muqova rasmini yuboring",
+        "ru": "📷 Отправьте обложку книги",
+        "en": "📷 Send the book cover"
+    },
+    "add:category": {
+        "uz": "📂 Kategoriyani tanlang",
+        "ru": "📂 Выберите категорию",
+        "en": "📂 Select category"
+    },
+    "add:collection": {
+        "uz": "🗂 To‘plamni tanlang",
+        "ru": "🗂 Выберите коллекцию",
+        "en": "🗂 Select collection"
+    },
+    "add:title": {
+        "uz": "✏️ Kitob nomini kiriting",
+        "ru": "✏️ Введите название книги",
+        "en": "✏️ Enter book title"
+    },
+    "add:author": {
+        "uz": "👤 Muallifni tanlang",
+        "ru": "👤 Выберите автора",
+        "en": "👤 Select author"
+    },
+    "add:description": {
+        "uz": "📝 Kitob tavsifini kiriting",
+        "ru": "📝 Введите описание книги",
+        "en": "📝 Enter book description"
+    },
+    "add:language": {
+        "uz": "🌐 Kitob tilini tanlang",
+        "ru": "🌐 Выберите язык книги",
+        "en": "🌐 Select book language"
+    },
+    "add:year_of_publication": {
+        "uz": "📅 Nashr yilini kiriting",
+        "ru": "📅 Укажите год издания",
+        "en": "📅 Enter publication year"
+    },
+    "add:number_of_pages": {
+        "uz": "📖 Sahifalar sonini kiriting",
+        "ru": "📖 Укажите количество страниц",
+        "en": "📖 Enter number of pages"
+    },
+    "add:weight": {
+        "uz": "⚖️ Kitob og‘irligini kiriting (gramm)",
+        "ru": "⚖️ Укажите вес книги (в граммах)",
+        "en": "⚖️ Enter book weight (grams)"
+    },
+    "add:next_part": {
+        "uz": "➡️ Keyingi qismni tanlang (agar mavjud bo‘lsa)",
+        "ru": "➡️ Выберите следующую часть (если есть)",
+        "en": "➡️ Select next part (if any)"
+    },
+    "add:link": {
+        "uz": "🔗 Yuklab olish havolasini yuboring",
+        "ru": "🔗 Отправьте ссылку для скачивания",
+        "en": "🔗 Send download link"
+    },
+    "cover:invalid": {
+        "uz": "❌ Rasm yuboring (faqat foto).",
+        "ru": "❌ Отправьте изображение (только фото).",
+        "en": "❌ Please send an image (photo only)."
+    },
+    "category:invalid": {
+        "uz": "❌ Noto‘g‘ri kategoriya.",
+        "ru": "❌ Некорректная категория.",
+        "en": "❌ Invalid category."
+    },
+    "collection:invalid": {
+        "uz": "❌ Noto‘g‘ri to‘plam.",
+        "ru": "❌ Некорректная коллекция.",
+        "en": "❌ Invalid collection."
+    },
+    "title:invalid": {
+        "uz": "❌ Kitob nomi faqat harflardan iborat bo‘lishi kerak.",
+        "ru": "❌ Название должно состоять только из букв.",
+        "en": "❌ Title must contain letters only."
+    },
+    "author:invalid": {
+        "uz": "❌ Noto‘g‘ri muallif.",
+        "ru": "❌ Некорректный автор.",
+        "en": "❌ Invalid author."
+    },
+    "description:invalid": {
+        "uz": "❌ Tavsif juda qisqa.",
+        "ru": "❌ Описание слишком короткое.",
+        "en": "❌ Description is too short."
+    },
+    "language:invalid": {
+        "uz": "❌ Noto‘g‘ri til.",
+        "ru": "❌ Некорректный язык.",
+        "en": "❌ Invalid language."
+    },
+    "year_of_publication:invalid": {
+        "uz": "❌ To‘g‘ri yil kiriting (masalan: 2022).",
+        "ru": "❌ Укажите корректный год (например: 2022).",
+        "en": "❌ Enter a valid year (e.g. 2022)."
+    },
+    "number_of_pages:invalid": {
+        "uz": "❌ Sahifalar soni raqam bo‘lishi kerak.",
+        "ru": "❌ Количество страниц должно быть числом.",
+        "en": "❌ Pages must be a number."
+    },
+    "weight:invalid": {
+        "uz": "❌ Og‘irlik raqamda bo‘lishi kerak (gramm).",
+        "ru": "❌ Вес должен быть числом (в граммах).",
+        "en": "❌ Weight must be a number (grams)."
+    },
+    "next_part:invalid": {
+        "uz": "❌ Noto‘g‘ri qism tanlandi.",
+        "ru": "❌ Некорректная часть.",
+        "en": "❌ Invalid next part."
+    },
+    "link:invalid": {
+        "uz": "❌ Noto‘g‘ri havola.",
+        "ru": "❌ Некорректная ссылка.",
+        "en": "❌ Invalid link."
     }
 }
 
