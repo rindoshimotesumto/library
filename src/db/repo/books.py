@@ -73,9 +73,9 @@ class BookRepository:
 
         return None
 
-    async def get_books(self,  last_id: int | None = None, page_size: int = 10):
+    async def get_books(self,  last_id: int | None = None, page_size: int = 1000000000):
         sql = """
-        SELECT books.id, books.book_name
+        SELECT *
             FROM books
         """
         params = []
@@ -137,7 +137,11 @@ class BookRepository:
         """
 
         params = (book_id, book_file_id)
-        await self.db.execute(sql, params)
+
+        try:
+            await self.db.execute(sql, params)
+        except Exception as e:
+            logger.exception("ошибочка")
 
     async def get_books_page_count(self, category_id: int = None, page_book_count: int = 9) -> int:
         sql = """
@@ -185,3 +189,9 @@ class BookRepository:
         except Exception as e:
             logger.error(e)
             return False
+
+    async def get_book_file(self, book_id: int):
+        sql = """SELECT file_id FROM book_files WHERE book_id = ?"""
+        params = (book_id,)
+
+        return await self.db.fetchone(sql, tuple(params))

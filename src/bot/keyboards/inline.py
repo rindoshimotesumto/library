@@ -9,7 +9,22 @@ class ChanellInfo:
     channel_url: str
     channel_name: str
 
+async def back_task(book_id: int) -> InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+
+    builder.button(
+        text="⬅️",
+        callback_data=f"book:show:{book_id}"
+    )
+
+    return builder.as_markup()
+
 async def more_btn(builder: InlineKeyboardBuilder, b_id: int, c_id: int, like: bool = False):
+    # builder.button(
+    #     text="✨ AI",
+    #     callback_data=f"ai:desc:{b_id}"
+    # )
+
     if like:
         builder.button(
             text=UZ_BTNS["book_actions"]["liked"],
@@ -21,6 +36,11 @@ async def more_btn(builder: InlineKeyboardBuilder, b_id: int, c_id: int, like: b
             text=UZ_BTNS["book_actions"]["like"],
             callback_data=f"book:show:like:{c_id}:{b_id}",
         )
+
+    builder.button(
+        text=UZ_BTNS['book_actions']['download'],
+        callback_data=f"book:download:{b_id}",
+    )
 
 async def next_btn(builder: InlineKeyboardBuilder, to: str, c_id: int, book_id: int) -> None:
 

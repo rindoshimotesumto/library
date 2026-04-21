@@ -39,8 +39,8 @@ async def main() -> None:
     )
 
     await run_migrations(db)
-    dp.message.middleware(CheckSubscriberMiddleware())
-    dp.callback_query.middleware(CheckSubscriberMiddleware())
+    # dp.message.middleware(CheckSubscriberMiddleware())
+    # dp.callback_query.middleware(CheckSubscriberMiddleware())
     dp.message.middleware(DbMiddleware(db))
     dp.callback_query.middleware(DbMiddleware(db))
 

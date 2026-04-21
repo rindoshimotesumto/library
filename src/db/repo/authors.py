@@ -11,6 +11,13 @@ class AuthorRepository:
         params = (author_name,)
         await self.db.execute(sql, params)
 
+    async def get_author(self, author_id: int) -> dict:
+        sql = "SELECT author_name FROM authors WHERE id = ?"
+        params = (author_id,)
+
+        row = await self.db.fetchone(sql, tuple(params))
+        return row
+
     async def get_authors(
             self,
             cursor_id: int | None = None,

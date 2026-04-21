@@ -121,7 +121,7 @@ UZ_BTNS: dict[str, dict[str, str]] = {
 
     "book_actions": {
         "read": "📖 O‘qishni boshlash",
-        "download": "⬇️ Yuklab olish",
+        "download": "📥",
         "like": "❤️",
         "liked": "❤️‍🔥",
     }

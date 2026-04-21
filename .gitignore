@@ -210,3 +210,6 @@ __marimo__/
 # DB
 src/backups
 src/data
+
+# TG session
+*.session

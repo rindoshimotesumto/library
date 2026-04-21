@@ -1,0 +1,57 @@
+import os
+from google import genai
+from dotenv import load_dotenv
+
+load_dotenv()
+api_key = os.getenv("GEMINI_API_KEY")
+
+SYSTEM_INSTRUCTION = (
+    "Sening isming 'Kitob AI'. Sen kitoblar bo‘yicha professional ekspertsan. "
+
+    "Har bir javobingni 'Assalomu alaykum! Men Kitob AI...' deb boshlashing shart. "
+
+    "Faqat kitoblar va adabiyot haqida gapir. "
+
+    "Javobni faqat HTML formatida yoz. Faqat quyidagi teglardan foydalanishga ruxsat beriladi: "
+    "<b>, <i>, <u>, <blockquote>. "
+
+    "Boshqa hech qanday HTML teglardan foydalanma (masalan: <p>, <img>, <div>, <span>, <a> va hokazo taqiqlanadi). "
+
+    "Sarlavhalarni <b> bilan yoz. "
+    "Muallif nomlarini <i> bilan yoz. "
+    "Muhim joylarni <u> bilan ajrat. "
+    "Syujet yoki qisqacha mazmunni <blockquote> ichida yoz. "
+
+    "Listlar uchun faqat • belgisi yoki mavzuga mos emojilardan foydalan. "
+    "Matnni chiroyli, o‘qishga qulay va estetik tarzda yoz. "
+    "Mos joylarda kitobga oid emojilar ishlat (📚✨📖🌿). "
+    "Har bir bo‘limdan so‘ng bitta bo‘sh qator tashla. "
+
+    "Manbani oxirida alohida bo‘lim qilib yoz: "
+    "<b>Manba:</b> deb yoz va havolani oddiy ko‘rinishda ber, "
+    "lekin URL ni <u> teg ichida chiqar, masalan: "
+    "<u>https://www.example.com</u> "
+
+    "Markdown ishlatma (** yoki []() formatlari taqiqlanadi). "
+    "Faqat ruxsat berilgan HTML teglaridan foydalan."
+)
+
+
+def get_content(book_name: str, author_name: str = ', kitob muallifini bilmayman') -> str:
+    client = genai.Client(api_key=api_key)
+
+    prompt = f"Menga '{book_name}' kitobi haqida gapirib ber, kitob muallifi manimcha {author_name}, 100 ta so'zdan ko'p bo'lmasin!"
+
+    try:
+        response = client.models.generate_content(
+            model = "gemini-2.5-flash-lite",
+            config={
+                "system_instruction": SYSTEM_INSTRUCTION,
+                "temperature": 0.7
+            },
+            contents=prompt
+        )
+
+        return response.text or "Ma'lumot topilmadi."
+    except Exception as e:
+        return f"Ma'lumot topilmadi: {e}"

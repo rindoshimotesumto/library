@@ -172,7 +172,6 @@ async def remove_author(message: Message, command: CommandObject, db: DataBase):
         logger.error(f"Error deleting author: {e}")
         await message.answer(f"❌ Произошла ошибка при удалении автора.")
 
-        
 # @router.message(F.photo)
 # async def cmd_photo(message: Message, db: DataBase):
 #     await message.answer(message.photo[-1].file_id)
