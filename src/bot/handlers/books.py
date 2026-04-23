@@ -4,9 +4,10 @@ from pyrogram import Client
 
 from aiogram import Router, F
 from aiogram.filters import Command, CommandObject
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message, CallbackQuery, MessageOriginChannel, MessageOriginChat
 from aiogram.fsm.context import FSMContext
 
+from bot.handlers.welcome import admin
 from src.i18n.uz import UZ_TEXTS, LANGS_FORMAT
 from src.bot.keyboards.inline import books_keyboard, back_btn, more_btn, InlineKeyboardBuilder, back_task
 from src.db.repo.books import BookRepository, Book
@@ -158,70 +159,107 @@ async def edit_book_name_3(message: Message, state: FSMContext, db: DataBase):
     await message.answer(f"Kitob ID -sini kiriting...")
     return
 
-@router.message(Command("go"))
-async def save_file_ids(message: Message, db: DataBase):
-    book_repo = BookRepository(db)
-    books = await book_repo.get_books()
-
+async def background_forwarding(books, db: DataBase):
     async with Client("user_session", api_id, api_hash) as app:
         for book in books:
             book_obj = Book(**book)
+            try:
+                message_id = int(book_obj.book_file_link.split("/")[-1])
 
-            message_id = int(book_obj.book_file_link.split("/")[-1])
-            msg = await app.get_messages("Railway_kutubxona", message_id)
+                # Вместо forward используем send_cached_media или copy_message
+                # Это отправит файл боту, и мы принудительно запишем ID книги в описание
+                await app.copy_message(
+                    chat_id=bot_username,
+                    from_chat_id="Railway_kutubxona",
+                    message_id=message_id,
+                    caption=f"book_id:{book_obj.id}"  # Пишем ID прямо в описание файла!
+                )
 
-            if msg.audio:
-                file_id = msg.audio.file_id
-            elif msg.voice:
-                file_id = msg.voice.file_id
-            elif msg.document:
-                file_id = msg.document.file_id
-            else:
-                continue
+                await asyncio.sleep(1.5)
+            except Exception as e:
+                print(f"Ошибка с книгой {book_obj.id}: {e}")
 
-            await book_repo.add_book_file(book_obj.id, file_id)
+@router.message(Command("go"))
+async def save_file_ids(message: Message, db: DataBase):
+    if message.from_user.id not in admin:
+        return
 
-    await message.answer("✅ Готово")
+    book_repo = BookRepository(db)
+    books = await book_repo.get_books()
+
+    # Запускаем пересылку в фоне, не блокируя бота
+    asyncio.create_task(background_forwarding(books, db))
+
+    # Сразу отвечаем пользователю, чтобы Telegram закрыл update
+    await message.answer("✅ Процесс обновления запущен. Файлы пересылаются боту в фоновом режиме...")
+
+
+@router.message(F.caption.startswith("book_id:"))
+async def handle_forwarded_book(message: Message, db: DataBase):
+    book_repo = BookRepository(db)
+
+    # 1. Извлекаем ID книги из подписи
+    try:
+        book_id = int(message.caption.split(":")[-1])
+    except (ValueError, IndexError):
+        return
+
+    # 2. Вытаскиваем file_id
+    file_id = None
+    if message.document:
+        file_id = message.document.file_id
+    elif message.audio:
+        file_id = message.audio.file_id
+
+    if file_id:
+        # 3. Просто сохраняем, поиск по ссылке больше не нужен!
+        await book_repo.add_book_file(book_id, file_id)
+        print(f"✅ Сохранено напрямую: Book ID {book_id} -> File {file_id}")
+
 
 @router.callback_query(F.data.startswith("book:download:"))
-async def get_file(call: CallbackQuery, state: FSMContext, db: DataBase):
+async def get_file(call: CallbackQuery, db: DataBase):
     await call.answer()
-
     book_repo = BookRepository(db)
     book_id = int(call.data.removeprefix("book:download:"))
 
-    file = await book_repo.get_book_file(book_id)
-    file_id = file['file_id']
+    file_data = await book_repo.get_book_file(book_id)
+    if not file_data:
+        return await call.message.answer("Файл еще не обработан системой.")
 
+    file_id = file_data['file_id']
+
+    # Теперь это сработает без ошибок
     try:
         await call.message.answer_document(document=file_id)
     except Exception:
         try:
             await call.message.answer_audio(audio=file_id)
         except Exception:
-            await call.message.answer_voice(voice=file_id)
+            await call.message.answer("Не удалось отправить файл.")
 
-@router.message(Command("get_file"))
-async def get_file(message: Message, command: CommandObject, db: DataBase):
-    book_repo = BookRepository(db)
 
-    if not command.args:
-        await message.answer("Укажи ID книги")
-        return
-
-    book_id = int(command.args.strip())
-    book = await book_repo.get_book_file(book_id)
-
-    if not book:
-        await message.answer("Файл не найден")
-        return
-
-    file_id = book["file_id"]
-
-    try:
-        await message.answer_document(document=file_id)
-    except Exception:
-        try:
-            await message.answer_audio(audio=file_id)
-        except Exception:
-            await message.answer_voice(voice=file_id)
+# @router.message(Command("get_file"))
+# async def get_file(message: Message, command: CommandObject, db: DataBase):
+#     book_repo = BookRepository(db)
+#
+#     if not command.args:
+#         await message.answer("Укажи ID книги")
+#         return
+#
+#     book_id = int(command.args.strip())
+#     book = await book_repo.get_book_file(book_id)
+#
+#     if not book:
+#         await message.answer("Файл не найден")
+#         return
+#
+#     file_id = book["file_id"]
+#
+#     try:
+#         await message.answer_document(document=file_id)
+#     except Exception:
+#         try:
+#             await message.answer_audio(audio=file_id)
+#         except Exception:
+#             await message.answer_voice(voice=file_id)

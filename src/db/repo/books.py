@@ -4,6 +4,9 @@ from dataclasses import dataclass
 from sqlite3 import IntegrityError
 from typing import Optional
 from zipapp import create_archive
+
+from _testcapi import awaitType
+
 from src.db.database import DataBase
 
 from src.config.conf_logs import logger
@@ -27,6 +30,13 @@ class Book:
 class BookRepository:
     def __init__(self, db: DataBase):
         self.db = db
+
+    async def get_book_by_link(self, link: str):
+        sql = """
+        SELECT id FROM books WHERE books.book_file_link = ?
+        """
+
+        return await self.db.fetchone(sql, (link,))
 
     async def add_book(self, book: Book) -> int:
         sql = """
